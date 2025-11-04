@@ -1,7 +1,6 @@
 {
-  "buildCommand": "cd blog && npm run build",
   "installCommand": "cd blog && npm install",
-  "outputDirectory": "blog/.next",
-  "framework": "nextjs"
+  "buildCommand": "cd blog && npm run build",
+  "devCommand": "cd blog && npm run dev"
 }
 
