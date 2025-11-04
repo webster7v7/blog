@@ -1,6 +1,10 @@
 {
-  "installCommand": "cd blog && npm install",
-  "buildCommand": "cd blog && npm run build",
-  "devCommand": "cd blog && npm run dev"
+  "version": 2,
+  "builds": [
+    {
+      "src": "blog/package.json",
+      "use": "@vercel/next"
+    }
+  ]
 }
 
