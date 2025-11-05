@@ -1,8 +1,9 @@
 import { createServerClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, FileText, Settings, Home, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, Home, LogOut, MessageSquare } from 'lucide-react';
 import HideFrontendNav from '@/components/HideFrontendNav';
+import { logout } from './actions';
 
 export default async function AdminLayout({
   children,
@@ -71,6 +72,14 @@ export default async function AdminLayout({
               <span>文章管理</span>
             </Link>
 
+            <Link
+              href="/admin/comments"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+            >
+              <MessageSquare className="w-5 h-5" />
+              <span>评论管理</span>
+            </Link>
+
                    <Link
                      href="/settings"
                      className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
@@ -101,7 +110,7 @@ export default async function AdminLayout({
           </nav>
 
           {/* 用户信息 */}
-          <div className="absolute bottom-6 left-6 right-6">
+          <div className="absolute bottom-6 left-6 right-6 space-y-3">
             <div className="backdrop-blur-md bg-white/60 dark:bg-gray-800/60 rounded-lg p-4 border border-gray-200/30 dark:border-gray-800/30">
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
                 {user.email}
@@ -110,6 +119,17 @@ export default async function AdminLayout({
                 管理员
               </p>
             </div>
+            
+            {/* 退出登录按钮 */}
+            <form action={logout}>
+              <button
+                type="submit"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>退出登录</span>
+              </button>
+            </form>
           </div>
         </aside>
 

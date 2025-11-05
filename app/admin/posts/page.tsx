@@ -1,17 +1,56 @@
 import { createServerClient } from '@/lib/supabase';
 import Link from 'next/link';
-import { Plus, Edit, Trash2, Eye, Calendar, FileText } from 'lucide-react';
+import { Plus, Edit, Eye, Calendar, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
+import DeletePostButton from '@/components/admin/DeletePostButton';
+import PostsFilter from '@/components/admin/PostsFilter';
 
-export default async function AdminPostsPage() {
+interface SearchParams {
+  search?: string;
+  status?: string;
+  sort?: string;
+}
+
+export default async function AdminPostsPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
   const supabase = await createServerClient();
 
-  // 获取所有文章（包括草稿）
-  const { data: posts } = await supabase
-    .from('posts')
-    .select('*')
-    .order('created_at', { ascending: false });
+  // 构建查询
+  let query = supabase.from('posts').select('*');
+
+  // 搜索筛选
+  if (params.search) {
+    query = query.or(`title.ilike.%${params.search}%,tags.cs.{${params.search}}`);
+  }
+
+  // 状态筛选
+  if (params.status === 'published') {
+    query = query.eq('status', 'published');
+  } else if (params.status === 'draft') {
+    query = query.eq('status', 'draft');
+  }
+
+  // 排序
+  switch (params.sort) {
+    case 'oldest':
+      query = query.order('created_at', { ascending: true });
+      break;
+    case 'views':
+      query = query.order('views', { ascending: false });
+      break;
+    case 'comments':
+      query = query.order('comments_count', { ascending: false });
+      break;
+    default: // newest
+      query = query.order('created_at', { ascending: false });
+  }
+
+  const { data: posts } = await query;
 
   return (
     <div className="space-y-6">
@@ -33,6 +72,9 @@ export default async function AdminPostsPage() {
           <span>新建文章</span>
         </Link>
       </div>
+
+      {/* 筛选器 */}
+      <PostsFilter />
 
       {/* 文章列表 */}
       <div className="backdrop-blur-md bg-white/80 dark:bg-gray-900/80 rounded-2xl border border-gray-200/30 dark:border-gray-800/30 overflow-hidden">
@@ -129,12 +171,7 @@ export default async function AdminPostsPage() {
                         >
                           <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                         </Link>
-                        <button
-                          className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                          title="删除"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
-                        </button>
+                        <DeletePostButton slug={post.slug} title={post.title} />
                       </div>
                     </td>
                   </tr>
