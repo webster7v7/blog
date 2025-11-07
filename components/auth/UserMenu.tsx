@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import { User as UserIcon, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -72,15 +71,8 @@ export default function UserMenu({ user }: UserMenuProps) {
       </button>
 
       {/* 下拉菜单 */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-56 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 rounded-xl shadow-xl border border-gray-200/30 dark:border-gray-800/30 py-2 z-50"
-          >
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-56 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 rounded-xl shadow-xl border border-gray-200/30 dark:border-gray-800/30 py-2 z-50 animate-fade-in">
             {/* 用户信息 */}
             <div className="px-4 py-3 border-b border-gray-200/30 dark:border-gray-800/30">
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -126,9 +118,8 @@ export default function UserMenu({ user }: UserMenuProps) {
                 <span>退出登录</span>
               </button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,58 @@
+# =====================================================
+# Vercel Deployment Ignore Configuration
+# Purpose: Optimize deployment by excluding unnecessary files
+# =====================================================
+
+# Documentation (keep only README.md)
+*.md
+!README.md
+
+# Database scripts and migrations
+*.sql
+!migrations/**
+
+# Performance check scripts
+scripts/
+
+# Development artifacts
+.next/
+.git/
+node_modules/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Environment files (already in .gitignore, but explicit here)
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build analysis
+.next/analyze/
+

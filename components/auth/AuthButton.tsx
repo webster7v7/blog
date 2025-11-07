@@ -1,11 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase-client';
 import { User } from '@supabase/supabase-js';
 import { LogIn } from 'lucide-react';
-import AuthModal from './AuthModal';
 import UserMenu from './UserMenu';
+
+// 动态导入AuthModal，仅在需要时加载
+const AuthModal = dynamic(() => import('./AuthModal'), {
+  ssr: false,
+});
 
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);

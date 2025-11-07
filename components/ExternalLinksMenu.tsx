@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Link2, ExternalLink, ChevronDown } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import type { ExternalLink as ExternalLinkType } from '@/types/external-link';
@@ -69,15 +68,8 @@ export default function ExternalLinksMenu() {
       </button>
 
       {/* 下拉菜单 */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-64 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 rounded-xl shadow-xl border border-gray-200/30 dark:border-gray-800/30 py-2 z-50 max-h-[400px] overflow-y-auto"
-          >
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-64 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 rounded-xl shadow-xl border border-gray-200/30 dark:border-gray-800/30 py-2 z-50 max-h-[400px] overflow-y-auto animate-fade-in">
             {/* 标题 */}
             <div className="px-4 py-3 border-b border-gray-200/30 dark:border-gray-800/30">
               <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -125,9 +117,8 @@ export default function ExternalLinksMenu() {
                 暂无外链
               </div>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }

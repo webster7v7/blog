@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 interface TagCloudProps {
@@ -20,15 +19,12 @@ export default function TagCloud({ tags }: TagCloudProps) {
       <div className="flex flex-wrap gap-3">
         {tags.map((tag, index) => (
           <Link key={tag} href={`/tags/${encodeURIComponent(tag)}`}>
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              whileHover={{ scale: 1.1 }}
-              className="inline-block px-4 py-2 text-sm rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white cursor-pointer hover:shadow-lg transition-shadow"
+            <span
+              style={{ animationDelay: `${index * 0.05}s` }}
+              className="inline-block px-4 py-2 text-sm rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white cursor-pointer hover:shadow-lg hover:scale-110 transition-all duration-200 animate-fade-in"
             >
               {tag}
-            </motion.span>
+            </span>
           </Link>
         ))}
       </div>

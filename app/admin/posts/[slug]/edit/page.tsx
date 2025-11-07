@@ -33,6 +33,7 @@ export default async function EditPostPage({ params }: PageProps) {
     content: post.content,
     excerpt: post.excerpt || '',
     tags: post.tags || [],
+    category: post.category || '',
     status: post.status || 'draft',
   };
 

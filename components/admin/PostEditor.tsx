@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { Loader2, Save, Eye } from 'lucide-react';
+import type { Category } from '@/types/category';
 
 // 动态导入 Markdown 编辑器（仅客户端）
 const MDEditor = dynamic(
@@ -19,6 +20,7 @@ interface PostEditorProps {
     content: string;
     excerpt: string;
     tags: string[];
+    category?: string;
     status: string;
   };
   mode: 'create' | 'edit';
@@ -27,14 +29,32 @@ interface PostEditorProps {
 export default function PostEditor({ initialData, mode }: PostEditorProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     slug: initialData?.slug || '',
     content: initialData?.content || '',
     excerpt: initialData?.excerpt || '',
     tags: initialData?.tags?.join(', ') || '',
+    category: initialData?.category || '',
     status: initialData?.status || 'draft',
   });
+
+  // 获取分类列表
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch('/api/admin/categories');
+        const data = await response.json();
+        if (response.ok) {
+          setCategories(data.categories || []);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   // 自动生成 slug
   const generateSlug = (title: string) => {
@@ -83,6 +103,7 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
         content: formData.content.trim(),
         excerpt: formData.excerpt.trim() || formData.content.slice(0, 150).trim() + '...',
         tags: tagsArray,
+        category: formData.category || null,
         status,
         published: status === 'published',
         published_at: status === 'published' ? new Date().toISOString() : null,
@@ -209,6 +230,33 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none"
           disabled={loading}
         />
+      </div>
+
+      {/* 分类 */}
+      <div>
+        <label
+          htmlFor="category"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
+          分类
+        </label>
+        <select
+          id="category"
+          value={formData.category}
+          onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          disabled={loading}
+        >
+          <option value="">无分类</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.slug}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          为文章选择一个分类，方便读者浏览相关内容
+        </p>
       </div>
 
       {/* 标签 */}

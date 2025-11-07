@@ -1,9 +1,26 @@
 'use client';
 
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeHighlight from 'rehype-highlight';
+import dynamic from 'next/dynamic';
 import 'highlight.js/styles/github-dark.css';
+
+// 动态导入Markdown渲染器（约250KB），仅在文章详情页加载
+const MarkdownRenderer = dynamic(
+  () => import('./MarkdownRenderer'),
+  {
+    loading: () => (
+      <div className="prose prose-lg dark:prose-invert max-w-none animate-pulse">
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/5 mb-6"></div>
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-3"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+      </div>
+    ),
+    ssr: true,
+  }
+);
 
 interface PostContentProps {
   content: string;
@@ -24,12 +41,7 @@ export default function PostContent({ content }: PostContentProps) {
       prose-blockquote:border-l-purple-500 prose-blockquote:bg-purple-50/50 dark:prose-blockquote:bg-purple-900/10 prose-blockquote:py-1
       prose-img:rounded-lg prose-img:shadow-lg
     ">
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight]}
-      >
-        {content}
-      </ReactMarkdown>
+      <MarkdownRenderer content={content} />
     </div>
   );
 }

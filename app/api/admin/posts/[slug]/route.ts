@@ -35,7 +35,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { title, content, excerpt, tags, status, published, published_at } = body;
+    const { title, content, excerpt, tags, category, status, published, published_at } = body;
 
     // 准备更新数据
     const updateData: any = {};
@@ -43,6 +43,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (content !== undefined) updateData.content = content;
     if (excerpt !== undefined) updateData.excerpt = excerpt;
     if (tags !== undefined) updateData.tags = tags;
+    if (category !== undefined) updateData.category = category;
     if (status !== undefined) updateData.status = status;
     if (published !== undefined) updateData.published = published;
     if (published_at !== undefined) updateData.published_at = published_at;

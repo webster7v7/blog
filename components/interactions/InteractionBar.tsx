@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import LikeButton from './LikeButton';
 import FavoriteButton from './FavoriteButton';
 import ShareButton from './ShareButton';
@@ -20,12 +19,7 @@ export default function InteractionBar({
   commentsCount,
 }: InteractionBarProps) {
   return (
-    <motion.div
-      className="sticky top-20 z-40 py-4 mb-8 backdrop-blur-md bg-white/70 dark:bg-gray-900/70 border-y border-gray-200/30 dark:border-gray-800/30"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
+    <div className="sticky top-20 z-40 py-4 mb-8 backdrop-blur-md bg-white/70 dark:bg-gray-900/70 border-y border-gray-200/30 dark:border-gray-800/30">
       <div className="max-w-4xl mx-auto px-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           {/* 左侧：统计信息 */}
@@ -48,7 +42,7 @@ export default function InteractionBar({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

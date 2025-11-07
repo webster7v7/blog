@@ -1,3 +1,5 @@
+import type { Category } from './category';
+
 export interface Post {
   id: string;
   title: string;
@@ -11,10 +13,15 @@ export interface Post {
   updated_at: string;
   views: number;
   tags: string[];
+  category: string | null;
   comments_count: number;
   likes_count: number;
   favorites_count: number;
 }
 
 export interface PostListItem extends Omit<Post, 'content'> {}
+
+export interface PostWithCategory extends PostListItem {
+  categoryData?: Category | null;
+}
 

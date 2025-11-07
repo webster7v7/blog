@@ -1,8 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useInView } from '@/hooks/useInView';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface FadeInViewProps {
   children: React.ReactNode;
@@ -17,37 +15,46 @@ export default function FadeInView({
   delay = 0,
   className = '' 
 }: FadeInViewProps) {
+  const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { threshold: 0.1 });
 
-  const directionOffset = {
-    up: { y: 40, x: 0 },
-    down: { y: -40, x: 0 },
-    left: { y: 0, x: 40 },
-    right: { y: 0, x: -40 },
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => setIsVisible(true), delay * 1000);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [delay]);
+
+  const directionClasses = {
+    up: 'translate-y-8',
+    down: '-translate-y-8',
+    left: 'translate-x-8',
+    right: '-translate-x-8',
   };
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{
-        opacity: 0,
-        ...directionOffset[direction],
-      }}
-      animate={isInView ? {
-        opacity: 1,
-        x: 0,
-        y: 0,
-      } : {}}
-      transition={{
-        duration: 0.6,
-        delay,
-        ease: 'easeOut',
-      }}
-      className={className}
+      className={`
+        transition-all duration-700 ease-out
+        ${isVisible 
+          ? 'opacity-100 translate-x-0 translate-y-0' 
+          : `opacity-0 ${directionClasses[direction]}`
+        }
+        ${className}
+      `}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
-

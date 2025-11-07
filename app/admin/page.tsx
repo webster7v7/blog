@@ -1,48 +1,43 @@
-import { createServerClient } from '@/lib/supabase';
 import { FileText, MessageSquare, Eye, Heart } from 'lucide-react';
+import { getCachedDashboardStats } from '@/lib/admin-cache';
 
 export default async function AdminDashboard() {
-  const supabase = await createServerClient();
+  // ✅ 优化：使用缓存的 Dashboard 统计数据
+  // 从 4 次查询 → 1 次 RPC → 缓存 60 秒
+  const stats = await getCachedDashboardStats();
 
-  // 获取统计数据
-  const [
-    { count: postsCount },
-    { count: commentsCount },
-    { data: posts },
-  ] = await Promise.all([
-    supabase.from('posts').select('*', { count: 'exact', head: true }),
-    supabase.from('comments').select('*', { count: 'exact', head: true }),
-    supabase.from('posts').select('views, likes_count').eq('published', true),
-  ]);
+  const statsData = {
+    postsCount: stats.posts_count,
+    commentsCount: stats.comments_count,
+    totalViews: stats.total_views,
+    totalLikes: stats.total_likes,
+  };
 
-  const totalViews = posts?.reduce((sum, post) => sum + (post.views || 0), 0) || 0;
-  const totalLikes = posts?.reduce((sum, post) => sum + (post.likes_count || 0), 0) || 0;
-
-  const stats = [
+  const statsCards = [
     {
       title: '总文章数',
-      value: postsCount || 0,
+      value: statsData.postsCount,
       icon: FileText,
       color: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-50 dark:bg-purple-900/20',
     },
     {
       title: '总评论数',
-      value: commentsCount || 0,
+      value: statsData.commentsCount,
       icon: MessageSquare,
       color: 'from-pink-500 to-pink-600',
       bgColor: 'bg-pink-50 dark:bg-pink-900/20',
     },
     {
       title: '总浏览量',
-      value: totalViews,
+      value: statsData.totalViews,
       icon: Eye,
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50 dark:bg-blue-900/20',
     },
     {
       title: '总点赞数',
-      value: totalLikes,
+      value: statsData.totalLikes,
       icon: Heart,
       color: 'from-red-500 to-red-600',
       bgColor: 'bg-red-50 dark:bg-red-900/20',
@@ -63,16 +58,16 @@ export default async function AdminDashboard() {
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => {
+        {statsCards.map((stat) => {
           const Icon = stat.icon;
           return (
             <div
               key={stat.title}
-              className="backdrop-blur-md bg-white/80 dark:bg-gray-900/80 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-800/30 hover:border-purple-400/50 dark:hover:border-purple-600/50 transition-all duration-300"
+              className="group backdrop-blur-md bg-white/80 dark:bg-gray-900/80 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-800/30 hover:border-purple-400/50 dark:hover:border-purple-600/50 transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                  <Icon className={`w-6 h-6 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`} style={{ WebkitTextFillColor: 'transparent' }} />
+                <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg transition-transform duration-300 group-hover:scale-110`}>
+                  <Icon className="w-6 h-6 text-white" strokeWidth={2} />
                 </div>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">

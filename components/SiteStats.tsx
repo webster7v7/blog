@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 
 // 网站创建时间（北京时间）
 const SITE_CREATION_DATE = new Date('2025-11-01T00:00:00+08:00');
@@ -16,12 +15,9 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, delay, suppressHydration = false }: StatCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      whileHover={{ scale: 1.02, y: -4 }}
-      className="backdrop-blur-md bg-white/60 dark:bg-gray-900/60 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-800/30 hover:border-purple-400/50 dark:hover:border-purple-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
+    <div
+      style={{ animationDelay: `${delay}s` }}
+      className="backdrop-blur-md bg-white/60 dark:bg-gray-900/60 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-800/30 hover:border-purple-400/50 dark:hover:border-purple-600/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10 hover:scale-[1.02] hover:-translate-y-1 animate-fade-in-up"
     >
       <div className="flex flex-col items-center text-center space-y-3">
         {/* 图标 */}
@@ -42,7 +38,7 @@ function StatCard({ icon, label, value, delay, suppressHydration = false }: Stat
           {value}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

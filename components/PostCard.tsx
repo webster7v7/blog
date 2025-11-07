@@ -1,76 +1,81 @@
 'use client';
 
-import Link from 'next/link';
-import { PostListItem } from '@/types/blog';
+import OptimizedLink from './OptimizedLink';
+import { useRouter } from 'next/navigation';
+import { PostWithCategory } from '@/types/blog';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { useRef } from 'react';
 
 interface PostCardProps {
-  post: PostListItem;
+  post: PostWithCategory;
 }
 
 export default function PostCard({ post }: PostCardProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  
-  const mouseXSpring = useSpring(x);
-  const mouseYSpring = useSpring(y);
-  
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['7.5deg', '-7.5deg']);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-7.5deg', '7.5deg']);
-  
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    
-    const rect = ref.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    
-    x.set(xPct);
-    y.set(yPct);
-  };
-  
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
+  // 直接从props获取分类数据（已在服务端预取）
+  const category = post.categoryData;
+
+  const handleCategoryClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (category?.slug) {
+      router.push(`/categories/${category.slug}`);
+    }
   };
 
   return (
-    <motion.article
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      whileHover={{ y: -8, transition: { duration: 0.2 } }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX,
-        rotateY,
-        transformStyle: 'preserve-3d',
-      }}
-      className="group"
-    >
-      <Link href={`/posts/${post.slug}`}>
-        <div className="backdrop-blur-md bg-white/60 dark:bg-gray-900/60 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-800/30 hover:border-purple-400/50 dark:hover:border-purple-600/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 relative overflow-hidden">
-          {/* 光影跟随效果 */}
-          <motion.div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-            style={{
-              background: `radial-gradient(600px circle at ${x.get() * 100 + 50}% ${y.get() * 100 + 50}%, rgba(167, 139, 250, 0.1), transparent 40%)`,
-            }}
-          />
+    <article className="group">
+      <OptimizedLink href={`/posts/${post.slug}`}>
+        <div className="
+          backdrop-blur-sm bg-white/70 dark:bg-gray-900/70 
+          rounded-2xl p-6 
+          border border-gray-200/30 dark:border-gray-800/30 
+          hover:border-purple-400/50 dark:hover:border-purple-600/50 
+          transition-[colors,opacity,transform] duration-300 
+          hover:shadow-xl hover:shadow-purple-500/10 
+          hover:-translate-y-2
+          relative overflow-hidden
+        ">
+          {/* 光影效果 */}
+          <div className="
+            absolute inset-0 opacity-0 group-hover:opacity-100 
+            transition-opacity duration-300 pointer-events-none
+            bg-gradient-radial from-purple-400/10 via-transparent to-transparent
+          " />
           
-          <div style={{ transform: 'translateZ(50px)' }} className="relative">
-            <h2 className="text-2xl font-semibold mb-3 text-gray-900 dark:text-gray-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+          <div className="relative">
+            {/* 分类标签 */}
+            {category && (
+              <div className="mb-3">
+                <span
+                  onClick={handleCategoryClick}
+                  className="
+                    inline-flex items-center px-3 py-1 rounded-full 
+                    text-xs font-medium text-white 
+                    hover:opacity-90 transition-opacity cursor-pointer
+                  "
+                  style={{ backgroundColor: category.color }}
+                  role="link"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCategoryClick(e as any);
+                    }
+                  }}
+                >
+                  {category.name}
+                </span>
+              </div>
+            )}
+            
+            <h2 className="
+              text-2xl font-semibold mb-3 
+              text-gray-900 dark:text-gray-100 
+              group-hover:text-purple-600 dark:group-hover:text-purple-400 
+              transition-colors
+            ">
               {post.title}
             </h2>
             
@@ -90,7 +95,11 @@ export default function PostCard({ post }: PostCardProps) {
                   {post.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 text-xs rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
+                      className="
+                        px-2 py-1 text-xs rounded-full 
+                        bg-purple-100 dark:bg-purple-900/30 
+                        text-purple-700 dark:text-purple-300
+                      "
                     >
                       {tag}
                     </span>
@@ -100,8 +109,7 @@ export default function PostCard({ post }: PostCardProps) {
             </div>
           </div>
         </div>
-      </Link>
-    </motion.article>
+      </OptimizedLink>
+    </article>
   );
 }
-

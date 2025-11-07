@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface TOCItem {
   id: string;
@@ -50,9 +49,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
   return (
     <>
       {/* 移动端按钮 */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="lg:hidden fixed bottom-24 right-8 z-40 p-3 rounded-full backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border border-gray-200/30 dark:border-gray-800/30 shadow-lg"
         aria-label="目录"
@@ -71,7 +68,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
             d="M4 6h16M4 12h16M4 18h7"
           />
         </svg>
-      </motion.button>
+      </button>
 
       {/* 桌面端侧边栏 */}
       <aside className="hidden lg:block fixed right-8 top-32 w-64 max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -104,23 +101,13 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
       </aside>
 
       {/* 移动端弹窗 */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="lg:hidden fixed inset-0 bg-black/50 z-40"
-            />
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed bottom-0 left-0 right-0 z-50 max-h-[70vh] overflow-y-auto backdrop-blur-md bg-white/95 dark:bg-gray-900/95 rounded-t-3xl p-6"
-            >
+      {isOpen && (
+        <>
+          <div
+            onClick={() => setIsOpen(false)}
+            className="lg:hidden fixed inset-0 bg-black/50 z-40 animate-fade-in"
+          />
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 max-h-[70vh] overflow-y-auto backdrop-blur-md bg-white/95 dark:bg-gray-900/95 rounded-t-3xl p-6 animate-fade-in">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   目录
@@ -166,10 +153,9 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
                   ))}
                 </ul>
               </nav>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          </div>
+        </>
+      )}
     </>
   );
 }

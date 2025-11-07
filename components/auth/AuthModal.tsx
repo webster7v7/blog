@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
@@ -42,29 +41,20 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
     onClose();
   };
 
-  const modalContent = (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* 背景遮罩 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999]"
-          />
+  const modalContent = isOpen && (
+    <>
+      {/* 背景遮罩 */}
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] animate-fade-in"
+      />
 
-          {/* 模态框 */}
-          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 overflow-y-auto pointer-events-none">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2 }}
-              className="relative w-full max-w-md my-8 backdrop-blur-md bg-white/95 dark:bg-gray-900/95 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-800/50 p-8 pointer-events-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
+      {/* 模态框 */}
+      <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 overflow-y-auto pointer-events-none">
+        <div
+          className="relative w-full max-w-md my-8 backdrop-blur-md bg-white/95 dark:bg-gray-900/95 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-800/50 p-8 pointer-events-auto animate-fade-in"
+          onClick={(e) => e.stopPropagation()}
+        >
               {/* 关闭按钮 */}
               <button
                 onClick={onClose}
@@ -96,11 +86,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                   onSwitchToLogin={() => setMode('login')}
                 />
               )}
-            </motion.div>
-          </div>
-        </>
-      )}
-    </AnimatePresence>
+        </div>
+      </div>
+    </>
   );
 
   // 使用 Portal 渲染到 body，避免被父组件层叠上下文影响

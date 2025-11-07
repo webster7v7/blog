@@ -13,11 +13,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
     
+    // ✅ 移除 content 字段，只搜索 title、excerpt、tags
     const { data, error } = await supabase
       .from('posts')
-      .select('id, title, slug, excerpt, cover_image, published, published_at, created_at, updated_at, views, tags, content')
+      .select('id, title, slug, excerpt, cover_image, published, published_at, created_at, updated_at, views, tags, category, comments_count, likes_count, favorites_count')
       .eq('published', true);
 
     if (error) {
@@ -30,7 +31,15 @@ export async function POST(request: NextRequest) {
 
     const results = searchPosts(query, data || []);
 
-    return NextResponse.json({ results });
+    // ✅ 增强缓存头（CDN缓存5分钟，过期后30分钟内返回缓存+后台更新）
+    return NextResponse.json(
+      { results },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=1800',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error in search API:', error);
     return NextResponse.json(

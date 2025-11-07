@@ -41,9 +41,18 @@ export async function GET(request: NextRequest) {
         .in('id', userIds);
 
       // 将用户信息附加到评论中
-      const profileMap = new Map(profiles?.map((p: any) => [p.id, p]) || []);
+      const profileMap = new Map(profiles?.map((p: any) => [p.id, {
+        id: p.id,              // ✅ 明确添加 id 字段
+        username: p.username,
+        avatar_url: p.avatar_url
+      }]) || []);
       comments.forEach((comment: any) => {
-        comment.user = profileMap.get(comment.user_id) || { username: '未知用户', avatar_url: null };
+        const profile = profileMap.get(comment.user_id);
+        comment.user = profile || { 
+          id: comment.user_id,  // ✅ 回退时也包含 id
+          username: '未知用户', 
+          avatar_url: null 
+        };
       });
     }
 
@@ -69,7 +78,15 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    return NextResponse.json({ comments: rootComments });
+    // ✅ 添加缓存头：CDN缓存30秒，过期后1分钟内返回缓存+后台更新
+    return NextResponse.json(
+      { comments: rootComments },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        },
+      }
+    );
   } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
@@ -147,7 +164,15 @@ export async function POST(request: NextRequest) {
     // 将用户信息附加到评论中
     const commentWithUser = {
       ...comment,
-      user: profile || { username: '未知用户', avatar_url: null }
+      user: profile ? {
+        id: profile.id,
+        username: profile.username,
+        avatar_url: profile.avatar_url
+      } : { 
+        id: user.id,           // ✅ 回退时也包含 id
+        username: '未知用户', 
+        avatar_url: null 
+      }
     };
 
     return NextResponse.json({ comment: commentWithUser }, { status: 201 });

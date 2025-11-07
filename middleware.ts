@@ -2,6 +2,16 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
+  // ✅ 优化：跳过Next.js Link组件的预取请求，避免不必要的认证和数据库查询
+  const isPrefetch = 
+    request.headers.get('next-router-prefetch') === '1' ||
+    request.headers.get('purpose') === 'prefetch';
+  
+  if (isPrefetch) {
+    // 对于预取请求，直接返回最小化响应，不执行认证逻辑
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -43,7 +53,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
-    // 检查是否是管理员
+    // 直接查询用户角色（Edge Runtime 兼容）
+    // 注意：不使用 unstable_cache，因为它需要文件系统访问，在 Edge Runtime 中不可用
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')

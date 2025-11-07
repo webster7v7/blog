@@ -1,7 +1,6 @@
 'use client';
 
 import { useScrollPosition } from '@/hooks/useScrollPosition';
-import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
 export default function ReadingProgress() {
@@ -16,18 +15,11 @@ export default function ReadingProgress() {
   }, [scrollPosition]);
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 z-50 h-1 bg-gray-200/20 dark:bg-gray-800/20"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
-      <motion.div
-        className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600"
+    <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-gray-200/20 dark:bg-gray-800/20">
+      <div
+        className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 transition-all duration-100"
         style={{ width: `${progress}%` }}
-        initial={{ width: 0 }}
-        transition={{ duration: 0.1 }}
       />
-    </motion.div>
+    </div>
   );
 }
-

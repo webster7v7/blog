@@ -2,21 +2,26 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Trash2, Loader2, MessageSquare, Calendar, User, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import Link from 'next/link';
+import Pagination from './Pagination';
 
 interface Comment {
   id: string;
   content: string;
   created_at: string;
-  user: {
+  user_id: string;
+  post_slug: string;
+  profiles: {
     username: string;
     email: string;
+    avatar_url: string | null;
   } | null;
-  post: {
+  posts: {
     title: string;
     slug: string;
   } | null;
@@ -24,9 +29,11 @@ interface Comment {
 
 interface CommentsListProps {
   initialComments: Comment[];
+  currentPage: number;
+  totalPages: number;
 }
 
-export default function CommentsList({ initialComments }: CommentsListProps) {
+export default function CommentsList({ initialComments, currentPage, totalPages }: CommentsListProps) {
   const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -111,26 +118,39 @@ export default function CommentsList({ initialComments }: CommentsListProps) {
               </td>
               <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-gray-400" />
+                  {comment.profiles?.avatar_url ? (
+                    <Image
+                      src={comment.profiles.avatar_url}
+                      alt={comment.profiles.username}
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 rounded-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
+                      {comment.profiles?.username?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {comment.user?.username || '匿名用户'}
+                      {comment.profiles?.username || '匿名用户'}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {comment.user?.email}
+                      {comment.profiles?.email || '无邮箱'}
                     </p>
                   </div>
                 </div>
               </td>
               <td className="px-6 py-4">
-                {comment.post ? (
+                {comment.posts ? (
                   <Link
-                    href={`/posts/${comment.post.slug}`}
+                    href={`/posts/${comment.posts.slug}`}
                     target="_blank"
                     className="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400 hover:underline"
                   >
                     <FileText className="w-4 h-4" />
-                    <span className="line-clamp-1">{comment.post.title}</span>
+                    <span className="line-clamp-1">{comment.posts.title}</span>
                   </Link>
                 ) : (
                   <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -166,6 +186,13 @@ export default function CommentsList({ initialComments }: CommentsListProps) {
           ))}
         </tbody>
       </table>
+
+      {/* 分页 */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl="/admin/comments"
+      />
     </div>
   );
 }

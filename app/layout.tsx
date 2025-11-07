@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import dynamic from "next/dynamic";
 import "./globals.css";
-import Header from "@/components/Header";
-import TopTagBar from "@/components/TopTagBar";
-import Footer from "@/components/Footer";
-import AnimatedBackground from "@/components/AnimatedBackground";
+import ConditionalHeader from "@/components/ConditionalHeader";
+import ConditionalTopTagBar from "@/components/ConditionalTopTagBar";
+import ConditionalFooter from "@/components/ConditionalFooter";
+import ConditionalMain from "@/components/ConditionalMain";
 import ScrollToTop from "@/components/ScrollToTop";
-import MouseGlow from "@/components/MouseGlow";
+import ResourcePreloader from "@/components/ResourcePreloader";
 import { Toaster } from "sonner";
+
+// 动态导入性能监控组件（仅客户端）
+// 注意：WebVitals本身是'use client'组件，无需设置ssr:false
+const WebVitals = dynamic(() => import("@/components/WebVitals"));
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,14 +39,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AnimatedBackground />
-        <MouseGlow />
-        <Header />
-        <TopTagBar />
-        <main className="pt-32 min-h-screen">
+        <ResourcePreloader />
+        <WebVitals />
+        <ConditionalHeader />
+        <ConditionalTopTagBar />
+        <ConditionalMain>
           {children}
-        </main>
-        <Footer />
+        </ConditionalMain>
+        <ConditionalFooter />
         <ScrollToTop />
         <Toaster position="top-center" richColors />
       </body>

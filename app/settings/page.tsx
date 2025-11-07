@@ -5,6 +5,9 @@ import AccountInfo from '@/components/admin/AccountInfo';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
+// ⚡ 性能优化：设置页面不使用缓存（需要实时数据）
+export const revalidate = 0;
+
 export default async function SettingsPage() {
   const supabase = await createServerClient();
 

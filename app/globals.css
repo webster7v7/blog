@@ -75,31 +75,4 @@ html {
   scroll-behavior: smooth;
 }
 
-/* 动画关键帧 */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.6s ease-out;
-}
+/* ✅ 性能优化：删除所有装饰性动画，保留 Tailwind 自带的 animate-pulse（骨架屏） */

@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, slug, content, excerpt, tags, status, published, published_at } = body;
+    const { title, slug, content, excerpt, tags, category, status, published, published_at } = body;
 
     // 验证必填字段
     if (!title || !slug || !content) {
@@ -61,6 +61,7 @@ export async function POST(request: NextRequest) {
         content,
         excerpt: excerpt || content.slice(0, 150) + '...',
         tags: tags || [],
+        category: category || null,
         status: status || 'draft',
         published: published || false,
         published_at: published_at || (status === 'published' ? new Date().toISOString() : null),

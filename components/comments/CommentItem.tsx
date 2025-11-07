@@ -7,8 +7,9 @@ import { formatDistanceToNow } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { Reply, Edit2, Trash2, MoreVertical } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import CommentForm from './CommentForm';
+import Link from 'next/link';
+import Image from 'next/image';
 
 interface CommentItemProps {
   comment: CommentWithUser;
@@ -92,14 +93,24 @@ export default function CommentItem({
   };
 
   return (
-    <div className={`${level > 0 ? 'ml-8 md:ml-12' : ''}`}>
+    <div className={`${level > 0 ? 'ml-4 md:ml-12' : ''}`}>
       <div className="flex gap-3 group">
-        {/* 头像 */}
-        <div className="flex-shrink-0">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-medium text-sm">
-            {avatarLetter}
-          </div>
-        </div>
+        {/* 头像 - 可点击跳转到用户主页 */}
+        <Link href={`/profile/${comment.user.id || comment.user_id}`} className="flex-shrink-0">
+          {comment.user.avatar_url ? (
+            <Image
+              src={comment.user.avatar_url}
+              alt={comment.user.username}
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-purple-400 transition-all cursor-pointer hover:scale-110"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-medium text-sm hover:scale-110 transition-transform cursor-pointer">
+              {avatarLetter}
+            </div>
+          )}
+        </Link>
 
         {/* 内容 */}
         <div className="flex-1 min-w-0">
@@ -131,12 +142,8 @@ export default function CommentItem({
                     <MoreVertical className="w-4 h-4 text-gray-500" />
                   </button>
 
-                  <AnimatePresence>
-                    {showMenu && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
+                  {showMenu && (
+                      <div
                         className="absolute right-0 mt-1 w-32 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 rounded-lg shadow-lg border border-gray-200/30 dark:border-gray-800/30 py-1 z-10"
                       >
                         <button
@@ -159,9 +166,8 @@ export default function CommentItem({
                           <Trash2 className="w-3 h-3" />
                           <span>删除</span>
                         </button>
-                      </motion.div>
+                      </div>
                     )}
-                  </AnimatePresence>
                 </div>
               )}
             </div>
@@ -215,14 +221,8 @@ export default function CommentItem({
           </div>
 
           {/* 回复表单 */}
-          <AnimatePresence>
-            {showReplyForm && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-3"
-              >
+          {showReplyForm && (
+              <div className="mt-3 animate-fade-in">
                 <CommentForm
                   postSlug={postSlug}
                   parentId={comment.id}
@@ -234,9 +234,8 @@ export default function CommentItem({
                   placeholder={`回复 @${comment.user.username}...`}
                   buttonText="回复"
                 />
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
 
           {/* 嵌套回复 */}
           {comment.replies && comment.replies.length > 0 && (

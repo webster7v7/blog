@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase-client';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Upload } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
+import AvatarCropModal from '@/components/AvatarCropModal';
 
 interface ProfileSettingsFormProps {
   profile: {
@@ -18,12 +21,139 @@ interface ProfileSettingsFormProps {
 export default function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [compressing, setCompressing] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [rawImageSrc, setRawImageSrc] = useState<string>('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [originalSize, setOriginalSize] = useState<number>(0);
+  const [compressedSize, setCompressedSize] = useState<number>(0);
+  const [previewUrl, setPreviewUrl] = useState<string>(profile.avatar_url || '');
   const [formData, setFormData] = useState({
     username: profile.username || '',
     bio: profile.bio || '',
     website: profile.website || '',
     avatar_url: profile.avatar_url || '',
   });
+
+  // 处理文件选择（打开裁剪模态框）
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 客户端验证：文件类型
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('仅支持 JPEG、PNG、WebP、GIF 格式');
+      return;
+    }
+
+    // 记录原始大小
+    setOriginalSize(file.size);
+
+    // 读取文件并显示裁剪模态框
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setRawImageSrc(reader.result as string);
+      setShowCropModal(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // 裁剪完成后，自动压缩图片
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setShowCropModal(false);
+    setCompressing(true);
+
+    try {
+      // 将 Blob 转换为 File
+      const croppedFile = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
+
+      // 自动压缩图片
+      const options = {
+        maxSizeMB: 0.5,            // 压缩到最大 500KB
+        maxWidthOrHeight: 400,     // 头像不需要太大
+        useWebWorker: true,        // 使用 Web Worker 后台压缩
+        fileType: 'image/webp',    // 统一转换为 WebP 格式
+      };
+
+      const compressedFile = await imageCompression(croppedFile, options);
+      
+      // 记录压缩后大小
+      setCompressedSize(compressedFile.size);
+      
+      // 显示压缩结果
+      const compressionRate = ((1 - compressedFile.size / originalSize) * 100).toFixed(0);
+      toast.success(
+        `裁剪并压缩成功！减少 ${compressionRate}% 大小 (${(originalSize / 1024).toFixed(0)}KB → ${(compressedFile.size / 1024).toFixed(0)}KB)`,
+        { duration: 3000 }
+      );
+
+      setAvatarFile(compressedFile);
+      
+      // 生成本地预览
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(compressedFile);
+    } catch (error: any) {
+      console.error('Image compression error:', error);
+      toast.error('图片压缩失败，请重试');
+      
+      // 压缩失败时使用裁剪后的原图
+      const croppedFile = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
+      setAvatarFile(croppedFile);
+      setCompressedSize(croppedFile.size);
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(croppedFile);
+    } finally {
+      setCompressing(false);
+    }
+  };
+
+  // 处理头像上传
+  const handleUploadAvatar = async () => {
+    if (!avatarFile) {
+      toast.error('请先选择图片');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', avatarFile);
+
+      const response = await fetch('/api/user/upload-avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Upload failed');
+      }
+
+      const { url } = await response.json();
+      
+      // 更新表单数据
+      setFormData((prev) => ({ ...prev, avatar_url: url }));
+      setPreviewUrl(url);
+      setAvatarFile(null);
+      
+      toast.success('头像上传成功');
+      router.refresh();
+    } catch (error: any) {
+      console.error('Error uploading avatar:', error);
+      toast.error(error.message || '上传失败，请重试');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,36 +309,111 @@ export default function ProfileSettingsForm({ profile }: ProfileSettingsFormProp
           />
         </div>
 
-        {/* 头像 URL */}
+        {/* 头像上传 */}
         <div>
-          <label
-            htmlFor="avatar_url"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-          >
-            头像 URL
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            头像
           </label>
-          <input
-            id="avatar_url"
-            type="url"
-            value={formData.avatar_url}
-            onChange={(e) => setFormData((prev) => ({ ...prev, avatar_url: e.target.value }))}
-            placeholder="https://example.com/avatar.jpg"
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            disabled={loading}
-          />
-          {formData.avatar_url && (
-            <div className="mt-3">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">头像预览：</p>
-              <img
-                src={formData.avatar_url}
+          
+          {/* 预览和上传 */}
+          <div className="flex items-start gap-4 mb-4">
+            {/* 头像预览 */}
+            {previewUrl ? (
+              <Image
+                src={previewUrl}
                 alt="头像预览"
-                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
+                width={80}
+                height={80}
+                className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                onError={() => setPreviewUrl('')}
               />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-2xl">
+                {formData.username.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            {/* 上传控制 */}
+            <div className="flex-1">
+              <input
+                type="file"
+                id="avatar-upload"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleFileChange}
+                className="hidden"
+                disabled={uploading || loading || compressing}
+              />
+              <label
+                htmlFor="avatar-upload"
+                className={`inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                  uploading || loading || compressing ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {compressing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>压缩中...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    <span>选择图片</span>
+                  </>
+                )}
+              </label>
+              
+              {avatarFile && !compressing && (
+                <button
+                  type="button"
+                  onClick={handleUploadAvatar}
+                  disabled={uploading || loading}
+                  className="ml-2 inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>上传中...</span>
+                    </>
+                  ) : (
+                    <span>上传</span>
+                  )}
+                </button>
+              )}
+              
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                支持 JPEG、PNG、WebP、GIF，自动压缩优化
+              </p>
+              {avatarFile && !compressing && (
+                <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+                  已选择：{avatarFile.name} ({(avatarFile.size / 1024).toFixed(1)} KB)
+                  {compressedSize > 0 && originalSize > compressedSize && (
+                    <span className="ml-2 text-purple-600 dark:text-purple-400">
+                      ✨ 已压缩 {((1 - compressedSize / originalSize) * 100).toFixed(0)}%
+                    </span>
+                  )}
+                </p>
+              )}
             </div>
-          )}
+          </div>
+
+          {/* 可选：手动输入 URL */}
+          <details className="mt-4">
+            <summary className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400">
+              或手动输入头像 URL
+            </summary>
+            <input
+              id="avatar_url"
+              type="url"
+              value={formData.avatar_url}
+              onChange={(e) => {
+                setFormData((prev) => ({ ...prev, avatar_url: e.target.value }));
+                setPreviewUrl(e.target.value);
+              }}
+              placeholder="https://example.com/avatar.jpg"
+              className="mt-2 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              disabled={loading}
+            />
+          </details>
         </div>
 
         {/* 提交按钮 */}
@@ -232,6 +437,15 @@ export default function ProfileSettingsForm({ profile }: ProfileSettingsFormProp
           </button>
         </div>
       </form>
+
+      {/* 裁剪模态框 */}
+      {showCropModal && (
+        <AvatarCropModal
+          imageSrc={rawImageSrc}
+          onCropComplete={handleCropComplete}
+          onClose={() => setShowCropModal(false)}
+        />
+      )}
     </div>
   );
 }

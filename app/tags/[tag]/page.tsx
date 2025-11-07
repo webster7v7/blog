@@ -4,8 +4,8 @@ import Breadcrumb from '@/components/Breadcrumb';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
-export const revalidate = 60;
-export const dynamic = 'force-dynamic';
+// ✅ 移除 force-dynamic，保留 revalidate
+export const revalidate = 300; // 5分钟缓存
 
 interface PageProps {
   params: Promise<{

@@ -1,8 +1,8 @@
 import { createServerClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, FileText, Settings, Home, LogOut, MessageSquare } from 'lucide-react';
-import HideFrontendNav from '@/components/HideFrontendNav';
+import { LayoutDashboard, FileText, Home, LogOut, MessageSquare, Users, Folder, Link2, Boxes } from 'lucide-react';
+import MobileSidebarWrapper from '@/components/admin/MobileSidebarWrapper';
 import { logout } from './actions';
 
 export default async function AdminLayout({
@@ -21,26 +21,26 @@ export default async function AdminLayout({
     redirect('/?redirect=/admin');
   }
 
-  // 检查是否是管理员
+  // 检查管理员权限
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'admin') {
+  if (!profile || profile.role !== 'admin') {
     redirect('/');
   }
 
   return (
     <>
-      {/* 隐藏前台导航组件 */}
-      <HideFrontendNav />
+      {/* 移动端侧边栏 */}
+      <MobileSidebarWrapper userEmail={user.email || ''} />
 
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-950 dark:via-purple-950 dark:to-gray-900">
         <div className="flex">
-          {/* 侧边栏 */}
-          <aside className="fixed left-0 top-0 h-screen w-64 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-r border-gray-200/30 dark:border-gray-800/30 p-6 z-50">
+          {/* 桌面端侧边栏 */}
+          <aside className="hidden lg:block fixed left-0 top-0 h-screen w-64 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-r border-gray-200/30 dark:border-gray-800/30 p-6 z-50">
           {/* Logo */}
           <Link href="/admin" className="flex items-center gap-2 mb-8">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
@@ -58,38 +58,52 @@ export default async function AdminLayout({
           <nav className="space-y-2">
             <Link
               href="/admin"
+              prefetch={true}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
             >
               <LayoutDashboard className="w-5 h-5" />
               <span>控制台</span>
             </Link>
 
-            <Link
-              href="/admin/posts"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
-            >
-              <FileText className="w-5 h-5" />
-              <span>文章管理</span>
-            </Link>
+          <Link
+            href="/admin/posts"
+            prefetch={true}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+          >
+            <FileText className="w-5 h-5" />
+            <span>文章管理</span>
+          </Link>
 
-            <Link
-              href="/admin/comments"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
-            >
-              <MessageSquare className="w-5 h-5" />
-              <span>评论管理</span>
-            </Link>
+          <Link
+            href="/admin/categories"
+            prefetch={true}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+          >
+            <Folder className="w-5 h-5" />
+            <span>分类管理</span>
+          </Link>
 
-                   <Link
-                     href="/settings"
-                     className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
-                   >
-                     <Settings className="w-5 h-5" />
-                     <span>设置</span>
-                   </Link>
+          <Link
+            href="/admin/comments"
+            prefetch={true}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+          >
+            <MessageSquare className="w-5 h-5" />
+            <span>评论管理</span>
+          </Link>
+
+                  <Link
+                    href="/admin/users"
+                    prefetch={true}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+                  >
+                    <Users className="w-5 h-5" />
+                    <span>用户管理</span>
+                  </Link>
 
                    <Link
                      href="/admin/external-links"
+                     prefetch={true}
                      className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
                    >
                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,10 +112,29 @@ export default async function AdminLayout({
                      <span>外链导航</span>
                    </Link>
 
+                   <Link
+                     href="/admin/personal-links"
+                     prefetch={true}
+                     className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+                   >
+                     <Link2 className="w-5 h-5" />
+                     <span>个人链接</span>
+                   </Link>
+
+                   <Link
+                     href="/admin/projects"
+                     prefetch={true}
+                     className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+                   >
+                     <Boxes className="w-5 h-5" />
+                     <span>已开发项目</span>
+                   </Link>
+
                    <div className="my-4 border-t border-gray-200/30 dark:border-gray-800/30" />
 
             <Link
               href="/"
+              prefetch={true}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
             >
               <Home className="w-5 h-5" />
@@ -134,7 +167,7 @@ export default async function AdminLayout({
         </aside>
 
         {/* 主内容区 */}
-        <main className="ml-64 flex-1 p-8">
+        <main className="lg:ml-64 flex-1 p-4 lg:p-8 pt-16 lg:pt-8">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

@@ -1,4 +1,5 @@
-import { getPostBySlug, getAllPosts, getAdjacentPosts } from '@/lib/posts';
+import dynamic from 'next/dynamic';
+import { getCachedPostContent, getPostStats, getAdjacentPosts } from '@/lib/posts';
 import { extractHeadings } from '@/lib/markdown';
 import { calculateReadingTime, countWords } from '@/lib/utils';
 import PostContent from '@/components/PostContent';
@@ -8,14 +9,22 @@ import PostNavigation from '@/components/PostNavigation';
 import ReadingProgress from '@/components/ReadingProgress';
 import TableOfContents from '@/components/TableOfContents';
 import InteractionBar from '@/components/interactions/InteractionBar';
-import CommentSection from '@/components/comments/CommentSection';
+import { CommentsSkeleton } from '@/components/loading/ComponentSkeletons';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
-export const revalidate = 3600;
-export const dynamic = 'force-dynamic';
+// 动态导入CommentSection
+const CommentSection = dynamic(
+  () => import('@/components/comments/CommentSection'),
+  { 
+    loading: () => <CommentsSkeleton />,
+  }
+);
+
+// ✅ 移除 force-dynamic，保留 revalidate
+export const revalidate = 3600; // 1小时缓存
 
 interface PageProps {
   params: Promise<{
@@ -25,7 +34,8 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  // 使用缓存版本获取元数据
+  const post = await getCachedPostContent(slug);
   
   if (!post) {
     return {
@@ -41,14 +51,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  
+  // 分离获取：缓存的静态内容 + 实时的动态统计
+  const [postContent, stats, adjacentPosts] = await Promise.all([
+    getCachedPostContent(slug),
+    getPostStats(slug),
+    getAdjacentPosts(slug),
+  ]);
 
-  if (!post) {
+  if (!postContent) {
     notFound();
   }
 
-  // 获取上下篇文章
-  const { prev, next } = await getAdjacentPosts(slug);
+  // 合并静态内容和动态统计
+  const post = {
+    ...postContent,
+    views: stats?.views || 0,
+    likes_count: stats?.likes_count || 0,
+    favorites_count: stats?.favorites_count || 0,
+    comments_count: stats?.comments_count || 0,
+  };
+
+  const { prev, next } = adjacentPosts;
   
   // 计算阅读时间和字数
   const readingTime = calculateReadingTime(post.content);

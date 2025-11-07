@@ -1,12 +1,20 @@
 import { TrendingUp, Eye } from 'lucide-react';
 import Link from 'next/link';
-import { getAllPosts } from '@/lib/posts';
+import { getCachedPostsList, getPostsStats } from '@/lib/posts';
 import SidebarCard from './SidebarCard';
 
 export default async function HotPosts() {
   // 获取浏览量最高的5篇文章
-  const allPosts = await getAllPosts();
-  const hotPosts = allPosts
+  const allPosts = await getCachedPostsList();
+  const statsMap = await getPostsStats();
+  
+  // 合并静态内容和动态统计
+  const postsWithStats = allPosts.map(post => ({
+    ...post,
+    views: statsMap.get(post.slug)?.views || 0,
+  }));
+  
+  const hotPosts = postsWithStats
     .sort((a, b) => b.views - a.views)
     .slice(0, 5);
 

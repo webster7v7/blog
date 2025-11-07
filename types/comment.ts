@@ -8,6 +8,7 @@ export interface Comment {
   updated_at: string;
   // 关联的用户信息
   user?: {
+    id: string;           // ✅ 添加 id 字段
     username: string;
     avatar_url: string | null;
   };
@@ -17,6 +18,7 @@ export interface Comment {
 
 export interface CommentWithUser extends Comment {
   user: {
+    id: string;           // ✅ 添加 id 字段
     username: string;
     avatar_url: string | null;
   };

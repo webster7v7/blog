@@ -1,4 +1,6 @@
-import Link from 'next/link';
+'use client';
+
+import OptimizedLink from './OptimizedLink';
 
 interface PostNavigationProps {
   prevPost?: { title: string; slug: string; excerpt?: string };
@@ -15,7 +17,7 @@ export default function PostNavigation({ prevPost, nextPost }: PostNavigationPro
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 上一篇 */}
         {prevPost ? (
-          <Link href={`/posts/${prevPost.slug}`} className="group">
+          <OptimizedLink href={`/posts/${prevPost.slug}`} className="group">
             <div className="h-full backdrop-blur-md bg-white/60 dark:bg-gray-900/60 rounded-xl p-6 border border-gray-200/30 dark:border-gray-800/30 hover:border-purple-400/50 dark:hover:border-purple-600/50 transition-all hover:shadow-lg">
               <div className="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400 mb-2">
                 <svg
@@ -43,14 +45,14 @@ export default function PostNavigation({ prevPost, nextPost }: PostNavigationPro
                 </p>
               )}
             </div>
-          </Link>
+          </OptimizedLink>
         ) : (
           <div></div>
         )}
 
         {/* 下一篇 */}
         {nextPost && (
-          <Link href={`/posts/${nextPost.slug}`} className="group">
+          <OptimizedLink href={`/posts/${nextPost.slug}`} className="group">
             <div className="h-full backdrop-blur-md bg-white/60 dark:bg-gray-900/60 rounded-xl p-6 border border-gray-200/30 dark:border-gray-800/30 hover:border-purple-400/50 dark:hover:border-purple-600/50 transition-all hover:shadow-lg">
               <div className="flex items-center justify-end gap-2 text-sm text-purple-600 dark:text-purple-400 mb-2">
                 <span>下一篇</span>
@@ -78,7 +80,7 @@ export default function PostNavigation({ prevPost, nextPost }: PostNavigationPro
                 </p>
               )}
             </div>
-          </Link>
+          </OptimizedLink>
         )}
       </div>
     </nav>

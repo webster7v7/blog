@@ -147,7 +147,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       liked = !!existingLike;
     }
 
-    return NextResponse.json({ liked, count: count || 0 });
+    // ✅ 添加缓存头：CDN缓存5秒，过期后30秒内返回缓存+后台更新
+    return NextResponse.json(
+      { liked, count: count || 0 },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=30',
+        },
+      }
+    );
   } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
