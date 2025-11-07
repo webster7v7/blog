@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { CommentWithUser } from '@/types/comment';
 import { MessageSquare, Loader2 } from 'lucide-react';
@@ -40,7 +40,7 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
   }, [supabase]);
 
   // 获取评论列表
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/comments?post_slug=${postSlug}`);
@@ -53,11 +53,11 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [postSlug]);
 
   useEffect(() => {
     fetchComments();
-  }, [postSlug]);
+  }, [fetchComments]);
 
   // 统计总评论数（包括回复）
   const countAllComments = (comments: CommentWithUser[]): number => {

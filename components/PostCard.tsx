@@ -61,7 +61,7 @@ export default function PostCard({ post }: PostCardProps) {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      handleCategoryClick(e as any);
+                      handleCategoryClick(e as unknown as React.MouseEvent);
                     }
                   }}
                 >

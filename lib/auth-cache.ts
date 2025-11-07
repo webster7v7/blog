@@ -1,10 +1,6 @@
 import { createServerClient } from './supabase';
 // import { unstable_cache } from 'next/cache'; // 已禁用：Edge Runtime 不支持
 
-// 缓存配置
-const AUTH_CACHE_TIME = 60; // 60秒
-const ROLE_CACHE_TIME = 300; // 5分钟（用户权限变更不频繁）
-
 // 检查用户认证和权限（带缓存）
 export async function checkAdminAuth() {
   const supabase = await createServerClient();

@@ -1,4 +1,4 @@
-import { User, Mail, Github, Globe } from 'lucide-react';
+import { Mail, Github, Globe } from 'lucide-react';
 import SidebarCard from './SidebarCard';
 
 export default function AuthorCard() {

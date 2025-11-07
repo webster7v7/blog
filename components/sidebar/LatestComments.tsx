@@ -5,6 +5,16 @@ import { zhCN } from 'date-fns/locale';
 import { createServerClient } from '@/lib/supabase';
 import SidebarCard from './SidebarCard';
 
+interface LatestComment {
+  id: string;
+  content: string;
+  post_slug: string;
+  created_at: string;
+  user: {
+    username: string;
+  } | null;
+}
+
 export default async function LatestComments() {
   const supabase = await createServerClient();
 
@@ -33,7 +43,7 @@ export default async function LatestComments() {
       icon={<MessageCircle className="w-5 h-5 text-purple-600 dark:text-purple-400" />}
     >
       <div className="space-y-4">
-        {comments.map((comment: any) => (
+        {comments.map((comment: LatestComment) => (
           <Link
             key={comment.id}
             href={`/posts/${comment.post_slug}#comment-${comment.id}`}

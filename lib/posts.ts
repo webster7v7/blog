@@ -5,6 +5,16 @@ import { unstable_cache } from 'next/cache';
 import { CACHE_STATIC_CONTENT, CACHE_LIST_DATA, CACHE_TAGS } from './cache';
 import { getCachedCategories } from './categories';
 
+// ==================== 类型定义 ====================
+
+interface PostStatsData {
+  slug: string;
+  views: number;
+  likes_count: number;
+  favorites_count: number;
+  comments_count: number;
+}
+
 // ==================== React cache 请求去重 ====================
 // 用于同一渲染周期内避免重复查询
 
@@ -270,7 +280,7 @@ export async function getPostsStats(): Promise<Map<string, {
   }
 
   const statsMap = new Map();
-  data?.forEach((post: any) => {
+  data?.forEach((post: PostStatsData) => {
     statsMap.set(post.slug, {
       views: post.views || 0,
       likes_count: post.likes_count || 0,

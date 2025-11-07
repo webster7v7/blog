@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { CommentWithUser } from '@/types/comment';
-import { createClient } from '@/lib/supabase-client';
 import { formatDistanceToNow } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -31,7 +30,6 @@ export default function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
 
   const isOwner = currentUserId === comment.user_id;
   const avatarLetter = comment.user.username.charAt(0).toUpperCase();
@@ -240,7 +238,7 @@ export default function CommentItem({
           {/* 嵌套回复 */}
           {comment.replies && comment.replies.length > 0 && (
             <div className="mt-4 space-y-4">
-              {comment.replies.map((reply: any) => (
+              {comment.replies.map((reply: CommentWithUser) => (
                 <CommentItem
                   key={reply.id}
                   comment={reply}
