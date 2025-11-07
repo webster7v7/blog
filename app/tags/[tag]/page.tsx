@@ -1,4 +1,4 @@
-import { getPostsByTag, getAllTags } from '@/lib/posts';
+import { getPostsByTag } from '@/lib/posts';
 import PostCard from '@/components/PostCard';
 import Breadcrumb from '@/components/Breadcrumb';
 import { notFound } from 'next/navigation';

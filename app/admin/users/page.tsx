@@ -1,6 +1,6 @@
 import { createServerClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
-import { Users as UsersIcon, Calendar, Mail } from 'lucide-react';
+import { Users as UsersIcon, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import RoleSelector from '@/components/admin/RoleSelector';

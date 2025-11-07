@@ -100,9 +100,9 @@ export async function POST(request: Request) {
           }
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // 删除旧头像失败不应阻止新头像上传
-      console.warn('Warning: Error during old avatar cleanup:', error.message);
+      console.warn('Warning: Error during old avatar cleanup:', error instanceof Error ? error.message : 'Unknown error');
     }
 
     // 6. 生成唯一文件名（基于 Supabase 官方最佳实践）
@@ -175,12 +175,12 @@ export async function POST(request: Request) {
       message: 'Avatar uploaded successfully',
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Unexpected error in POST /api/user/upload-avatar:', error);
     return NextResponse.json(
       { 
         error: 'Internal server error',
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
     );

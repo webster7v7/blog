@@ -48,9 +48,9 @@ export default function ProjectForm({ project, onSuccess }: ProjectFormProps) {
       const data = await response.json();
       setFormData({ ...formData, [field]: data.url });
       toast.success('文件上传成功');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading file:', error);
-      toast.error(error.message || '上传失败');
+      toast.error(error instanceof Error ? error.message : '上传失败');
     } finally {
       setUploading(null);
     }

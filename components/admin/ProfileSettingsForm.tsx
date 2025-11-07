@@ -97,7 +97,7 @@ export default function ProfileSettingsForm({ profile }: ProfileSettingsFormProp
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(compressedFile);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Image compression error:', error);
       toast.error('图片压缩失败，请重试');
       
@@ -147,9 +147,9 @@ export default function ProfileSettingsForm({ profile }: ProfileSettingsFormProp
       
       toast.success('头像上传成功');
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading avatar:', error);
-      toast.error(error.message || '上传失败，请重试');
+      toast.error(error instanceof Error ? error.message : '上传失败，请重试');
     } finally {
       setUploading(false);
     }

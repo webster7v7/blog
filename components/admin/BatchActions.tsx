@@ -65,9 +65,9 @@ export default function BatchActions({
       onClearSelection();
       onSuccess();
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Batch action error:', error);
-      toast.error(error.message || `${actionName}时发生错误`);
+      toast.error(error instanceof Error ? error.message : `${actionName}时发生错误`);
     } finally {
       setLoading(false);
     }

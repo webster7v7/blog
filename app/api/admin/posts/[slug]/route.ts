@@ -38,7 +38,16 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { title, content, excerpt, tags, category, status, published, published_at } = body;
 
     // 准备更新数据
-    const updateData: any = {};
+    const updateData: Partial<{
+      title: string;
+      content: string;
+      excerpt: string;
+      tags: string[];
+      category: string;
+      status: string;
+      published: boolean;
+      published_at: string;
+    }> = {};
     if (title !== undefined) updateData.title = title;
     if (content !== undefined) updateData.content = content;
     if (excerpt !== undefined) updateData.excerpt = excerpt;

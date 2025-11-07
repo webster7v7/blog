@@ -46,9 +46,9 @@ export default function CategoriesList({ initialCategories }: CategoriesListProp
       toast.success('分类已删除！');
       setCategories((prev) => prev.filter((c) => c.id !== category.id));
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Delete error:', error);
-      toast.error(error.message || '删除分类失败');
+      toast.error(error instanceof Error ? error.message : '删除分类失败');
     } finally {
       setDeletingId(null);
     }

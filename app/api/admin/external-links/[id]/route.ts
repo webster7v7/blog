@@ -38,7 +38,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { name, url, icon, order, is_visible } = body;
 
     // 准备更新数据
-    const updateData: any = {};
+    const updateData: Partial<{
+      name: string;
+      url: string;
+      icon: string;
+      order: number;
+      is_visible: boolean;
+    }> = {};
     if (name !== undefined) updateData.name = name;
     if (url !== undefined) {
       // 验证 URL 格式

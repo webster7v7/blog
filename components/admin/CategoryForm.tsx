@@ -81,9 +81,9 @@ export default function CategoryForm({ category, onClose, onSuccess }: CategoryF
       toast.success(category ? '分类已更新！' : '分类已创建！');
       onSuccess();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Form error:', error);
-      toast.error(error.message || '操作失败');
+      toast.error(error instanceof Error ? error.message : '操作失败');
     } finally {
       setLoading(false);
     }

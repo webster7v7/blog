@@ -77,7 +77,7 @@ export default async function AdminCommentsPage({
     // ✅ 优化：批量获取用户 emails（从 auth.users，使用 admin client）
     // 从 N 次 getUserById API 调用 → 1 次 listUsers 批量调用
     // 性能提升：90-95% (N×5ms → 单次 15ms)
-    let emailMap = new Map<string, string>();
+    const emailMap = new Map<string, string>();
     try {
       const adminClient = createAdminClient();
       

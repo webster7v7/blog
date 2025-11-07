@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Loader2, Upload, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Upload } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 import type { ExternalLink } from '@/types/external-link';
 
@@ -135,9 +135,9 @@ export default function ExternalLinkForm({
       setFormData((prev) => ({ ...prev, icon: url }));
       setIconPreview(url);
       toast.success('图标上传成功');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading icon:', error);
-      toast.error(error.message || '图标上传失败，请重试');
+      toast.error(error instanceof Error ? error.message : '图标上传失败，请重试');
     } finally {
       setUploading(false);
     }
@@ -195,9 +195,9 @@ export default function ExternalLinkForm({
 
       const { link: savedLink } = await response.json();
       onSuccess(savedLink);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving link:', error);
-      toast.error(error.message || '保存失败，请重试');
+      toast.error(error instanceof Error ? error.message : '保存失败，请重试');
     } finally {
       setLoading(false);
     }

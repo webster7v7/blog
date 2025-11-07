@@ -27,9 +27,9 @@ export default function AdminCategoriesPage() {
       }
 
       setCategories(data.categories || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching categories:', error);
-      toast.error(error.message || '加载分类失败');
+      toast.error(error instanceof Error ? error.message : '加载分类失败');
     } finally {
       setLoading(false);
     }

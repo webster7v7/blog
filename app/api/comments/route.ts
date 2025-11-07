@@ -1,6 +1,6 @@
 import { createServerClient } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import type { Comment } from '@/types/comment';
 
 // GET /api/comments?post_slug=xxx - 获取文章的所有评论
 export async function GET(request: NextRequest) {
@@ -34,19 +34,19 @@ export async function GET(request: NextRequest) {
 
     // 获取所有用户信息
     if (comments && comments.length > 0) {
-      const userIds = [...new Set(comments.map((c: any) => c.user_id))];
+      const userIds = [...new Set(comments.map((c: { user_id: string }) => c.user_id))];
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, username, avatar_url')
         .in('id', userIds);
 
       // 将用户信息附加到评论中
-      const profileMap = new Map(profiles?.map((p: any) => [p.id, {
+      const profileMap = new Map(profiles?.map((p: { id: string; username: string; avatar_url: string | null }) => [p.id, {
         id: p.id,              // ✅ 明确添加 id 字段
         username: p.username,
         avatar_url: p.avatar_url
       }]) || []);
-      comments.forEach((comment: any) => {
+      comments.forEach((comment: { user_id: string; user?: unknown }) => {
         const profile = profileMap.get(comment.user_id);
         comment.user = profile || { 
           id: comment.user_id,  // ✅ 回退时也包含 id
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     // 组织评论为树形结构
     const commentMap = new Map();
-    const rootComments: any[] = [];
+    const rootComments: Comment[] = [];
 
     // 第一遍：创建所有评论的映射
     comments?.forEach((comment) => {
@@ -99,7 +99,6 @@ export async function GET(request: NextRequest) {
 // POST /api/comments - 创建新评论
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
     const supabase = await createServerClient();
 
     // 检查用户是否登录

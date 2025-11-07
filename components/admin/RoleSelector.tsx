@@ -50,9 +50,9 @@ export default function RoleSelector({
 
       toast.success(`成功将 "${username}" 的角色更新为 "${newRole === 'admin' ? '管理员' : '用户'}"`);
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to update role:', error);
-      toast.error(error.message || '更新角色时发生错误');
+      toast.error(error instanceof Error ? error.message : '更新角色时发生错误');
     } finally {
       setLoading(false);
     }

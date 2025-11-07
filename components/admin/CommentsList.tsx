@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Trash2, Loader2, MessageSquare, Calendar, User, FileText } from 'lucide-react';
+import { Trash2, Loader2, MessageSquare, Calendar, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';

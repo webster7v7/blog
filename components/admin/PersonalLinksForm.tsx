@@ -81,9 +81,9 @@ export default function PersonalLinksForm({ link, onSuccess }: PersonalLinksForm
       setFormData((prev) => ({ ...prev, icon: url }));
       setIconPreview(url);
       toast.success('图标上传成功');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading icon:', error);
-      toast.error(error.message || '图标上传失败，请重试');
+      toast.error(error instanceof Error ? error.message : '图标上传失败，请重试');
     } finally {
       setUploading(false);
     }
