@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
         id,
         created_at,
         post_slug,
-        posts (
+        posts:post_slug (
           id,
           title,
           slug,
