@@ -42,7 +42,7 @@ export default function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormPro
         router.refresh();
         onSuccess?.();
       }
-    } catch (error) {
+    } catch {
       toast.error('注册失败，请重试');
     } finally {
       setLoading(false);

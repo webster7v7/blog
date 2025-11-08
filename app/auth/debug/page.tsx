@@ -1,5 +1,6 @@
 import { createServerClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 
 export default async function AuthDebugPage() {
   const supabase = await createServerClient();
@@ -78,12 +79,12 @@ export default async function AuthDebugPage() {
 
             {/* 操作按钮 */}
             <div className="flex gap-4">
-              <a
+              <Link
                 href="/"
                 className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-200"
               >
                 返回首页
-              </a>
+              </Link>
               <form action="/api/auth/logout" method="POST">
                 <button
                   type="submit"

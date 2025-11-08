@@ -29,7 +29,7 @@ export default function LeftSidebar() {
   // 获取 Lucide 图标组件
   const getIcon = (iconName: string | null) => {
     if (!iconName) return null;
-    const Icon = (Icons as any)[iconName];
+    const Icon = Icons[iconName as keyof typeof Icons];
     return Icon ? <Icon className="w-5 h-5" /> : null;
   };
 

@@ -35,7 +35,7 @@ export default function LoginForm({ onSuccess, onSwitchToSignUp }: LoginFormProp
         router.refresh();
         onSuccess?.();
       }
-    } catch (error) {
+    } catch {
       toast.error('登录失败，请重试');
     } finally {
       setLoading(false);

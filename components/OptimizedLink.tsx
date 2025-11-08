@@ -3,12 +3,11 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-interface OptimizedLinkProps {
+interface OptimizedLinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   href: string;
   children: React.ReactNode;
   className?: string;
   prefetch?: boolean | null;
-  [key: string]: any;
 }
 
 /**

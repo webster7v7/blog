@@ -18,7 +18,7 @@ interface Comment {
   post_slug: string;
   profiles: {
     username: string;
-    email: string;
+    email: string | null;
     avatar_url: string | null;
   } | null;
   posts: {

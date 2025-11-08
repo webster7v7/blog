@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import ProjectCard from '@/components/ProjectCard';
 import type { Project } from '@/types/projects';
 import { PROJECT_CATEGORIES } from '@/types/projects';
@@ -73,7 +74,7 @@ export default async function ProjectsPage() {
               const categoryProjects = projectsByCategory[categoryKey];
               if (!categoryProjects || categoryProjects.length === 0) return null;
 
-              const IconComponent = require('lucide-react')[categoryInfo.icon];
+              const IconComponent = LucideIcons[categoryInfo.icon as keyof typeof LucideIcons];
 
               return (
                 <div key={categoryKey}>

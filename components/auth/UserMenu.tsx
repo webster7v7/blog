@@ -35,7 +35,7 @@ export default function UserMenu({ user }: UserMenuProps) {
       toast.success('已退出登录');
       router.refresh();
       setIsOpen(false);
-    } catch (error) {
+    } catch {
       toast.error('退出失败，请重试');
     }
   };

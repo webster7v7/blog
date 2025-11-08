@@ -19,7 +19,19 @@ export default async function EditPostPage({ params }: PageProps) {
     .from('posts')
     .select('*')
     .eq('slug', slug)
-    .single();
+    .single() as {
+      data: {
+        title: string;
+        slug: string;
+        content: string;
+        excerpt: string | null;
+        tags: string[] | null;
+        category: string | null;
+        status: string | null;
+        [key: string]: unknown;
+      } | null;
+      error: unknown;
+    };
 
   // 处理错误或文章不存在
   if (error || !post) {

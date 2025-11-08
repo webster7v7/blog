@@ -29,7 +29,7 @@ export default async function AdminCommentsPage({
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { role: string } | null };
 
   if (profile?.role !== 'admin') {
     redirect('/');
@@ -46,7 +46,18 @@ export default async function AdminCommentsPage({
     .from('comments')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
-    .range(from, to);
+    .range(from, to) as {
+      data: Array<{
+        id: string;
+        user_id: string;
+        post_slug: string;
+        content: string;
+        created_at: string;
+        [key: string]: unknown;
+      }> | null;
+      error: { message: string } | null;
+      count: number | null;
+    };
 
   // 计算总页数
   const totalPages = Math.ceil((count || 0) / pageSize);
@@ -56,7 +67,24 @@ export default async function AdminCommentsPage({
   }
 
   // 优化：批量获取用户和文章信息，避免 N+1 查询
-  let comments = [];
+  interface CommentWithRelations {
+    id: string;
+    user_id: string;
+    post_slug: string;
+    content: string;
+    created_at: string;
+    profiles: {
+      username: string;
+      email: string | null;
+      avatar_url: string | null;
+    } | null;
+    posts: {
+      title: string;
+      slug: string;
+    } | null;
+  }
+
+  let comments: CommentWithRelations[] = [];
   if (rawComments && rawComments.length > 0) {
     // 提取唯一的 user_id 和 post_slug
     const uniqueUserIds = [...new Set(rawComments.map(c => c.user_id))];
@@ -66,13 +94,17 @@ export default async function AdminCommentsPage({
     const { data: profiles } = await supabase
       .from('profiles')
       .select('id, username, avatar_url')
-      .in('id', uniqueUserIds);
+      .in('id', uniqueUserIds) as {
+        data: Array<{ id: string; username: string; avatar_url: string | null }> | null;
+      };
 
     // 批量查询 posts
     const { data: posts } = await supabase
       .from('posts')
       .select('slug, title')
-      .in('slug', uniquePostSlugs);
+      .in('slug', uniquePostSlugs) as {
+        data: Array<{ slug: string; title: string }> | null;
+      };
 
     // ✅ 优化：批量获取用户 emails（从 auth.users，使用 admin client）
     // 从 N 次 getUserById API 调用 → 1 次 listUsers 批量调用
@@ -109,14 +141,25 @@ export default async function AdminCommentsPage({
     const postMap = new Map(posts?.map(p => [p.slug, p]) || []);
 
     // 组合数据
-    comments = rawComments.map(comment => ({
-      ...comment,
-      profiles: {
-        ...profileMap.get(comment.user_id),
-        email: emailMap.get(comment.user_id) || null,
-      },
-      posts: postMap.get(comment.post_slug),
-    }));
+    comments = rawComments.map(comment => {
+      const profile = profileMap.get(comment.user_id);
+      const post = postMap.get(comment.post_slug);
+      const email = emailMap.get(comment.user_id) || null;
+
+      return {
+        id: comment.id,
+        user_id: comment.user_id,
+        post_slug: comment.post_slug,
+        content: comment.content,
+        created_at: comment.created_at,
+        profiles: profile ? {
+          username: profile.username,
+          avatar_url: profile.avatar_url,
+          email: email,
+        } : null,
+        posts: post || null,
+      };
+    });
   }
 
   return (

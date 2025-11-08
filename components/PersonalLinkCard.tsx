@@ -26,7 +26,7 @@ export default function PersonalLinkCard({ link, index }: PersonalLinkCardProps)
 
     // 如果是 Lucide 图标名
     if (iconValue) {
-      const IconComponent = (LucideIcons as any)[iconValue];
+      const IconComponent = LucideIcons[iconValue as keyof typeof LucideIcons];
       if (IconComponent) {
         return <IconComponent className="w-6 h-6" strokeWidth={2} />;
       }

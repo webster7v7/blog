@@ -34,7 +34,7 @@ export default async function AdminUsersPage({
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { role: string } | null };
 
   if (profile?.role !== 'admin') {
     redirect('/');
@@ -51,7 +51,19 @@ export default async function AdminUsersPage({
     .from('profiles')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
-    .range(from, to);
+    .range(from, to) as {
+      data: Array<{
+        id: string;
+        username: string;
+        avatar_url: string | null;
+        bio: string | null;
+        website: string | null;
+        role: string | null;
+        created_at: string;
+        [key: string]: unknown;
+      }> | null;
+      count: number | null;
+    };
 
   // 计算总页数
   const totalPages = Math.ceil((count || 0) / pageSize);
@@ -62,7 +74,7 @@ export default async function AdminUsersPage({
   // 并发获取所有统计数据
   const statsResults = await Promise.all(
     profileIds.map(id => 
-      supabase.rpc('get_user_stats', { user_uuid: id })
+      supabase.rpc('get_user_stats', { user_uuid: id } as never)
     )
   );
 

@@ -5,9 +5,10 @@ import type { UpdatePersonalLinkInput } from '@/types/projects';
 // PUT /api/admin/personal-links/[id] - Update personal link
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createServerClient();
     
     // Check authentication
@@ -32,7 +33,7 @@ export async function PUT(
     const { data: link, error } = await supabase
       .from('personal_links')
       .update(body)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -57,9 +58,10 @@ export async function PUT(
 // DELETE /api/admin/personal-links/[id] - Delete personal link
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createServerClient();
     
     // Check authentication
@@ -82,7 +84,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('personal_links')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       console.error('Error deleting personal link:', error);

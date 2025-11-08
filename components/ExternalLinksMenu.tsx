@@ -45,7 +45,7 @@ export default function ExternalLinksMenu() {
   // 获取 Lucide 图标
   const getIcon = (iconName: string | null) => {
     if (!iconName) return null;
-    const Icon = (Icons as any)[iconName];
+    const Icon = Icons[iconName as keyof typeof Icons];
     return Icon ? <Icon className="w-4 h-4" /> : null;
   };
 

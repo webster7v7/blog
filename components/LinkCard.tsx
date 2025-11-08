@@ -27,7 +27,7 @@ export default function LinkCard({ link, index }: LinkCardProps) {
 
     // 如果是 Lucide 图标名
     if (iconValue) {
-      const Icon = (Icons as any)[iconValue];
+      const Icon = Icons[iconValue as keyof typeof Icons];
       if (Icon) {
         return <Icon className="w-8 h-8 md:w-10 md:h-10 text-gray-700 dark:text-gray-200" strokeWidth={1.5} />;
       }

@@ -20,17 +20,19 @@ export default async function PersonalLinksPage() {
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { role: string } | null };
 
   if (!profile || profile.role !== 'admin') {
     redirect('/');
   }
 
   // Fetch all personal links
-  const { data: links = [] } = await supabase
+  const { data: linksData } = await supabase
     .from('personal_links')
     .select('*')
     .order('order_index', { ascending: true });
+
+  const links = linksData || [];
 
   return (
     <div>

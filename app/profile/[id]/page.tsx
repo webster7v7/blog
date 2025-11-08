@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import PostCard from '@/components/PostCard';
 import { FileText } from 'lucide-react';
 import type { Metadata } from 'next';
+import type { PostWithCategory } from '@/types/blog';
 
 // ⚡ 性能优化：启用页面缓存（5分钟）
 export const revalidate = 300;
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .eq('id', id)
     .single();
 
-  const username = (profile as any)?.username;
+  const username = profile?.username as string | undefined;
 
   return {
     title: username ? `${username} 的文章 | Webster` : '用户资料 | Webster',
@@ -55,7 +56,7 @@ export default async function ProfilePostsPage({ params }: PageProps) {
       
       {posts && posts.length > 0 ? (
         <div className="grid gap-8 md:grid-cols-2">
-          {posts.map((post: any) => (
+          {posts.map((post: PostWithCategory) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>

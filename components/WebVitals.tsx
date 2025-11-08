@@ -46,9 +46,9 @@ export default function WebVitals() {
         // 监听CLS (Cumulative Layout Shift)
         let clsValue = 0;
         const clsObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries() as (PerformanceEntry & { value?: number })[];
+          const entries = list.getEntries() as (PerformanceEntry & { value?: number; hadRecentInput?: boolean })[];
           entries.forEach((entry) => {
-            if (!(entry as any).hadRecentInput) {
+            if (!entry.hadRecentInput) {
               clsValue += entry.value || 0;
             }
           });
@@ -82,7 +82,7 @@ export default function WebVitals() {
           });
         });
         navigationObserver.observe({ type: 'navigation', buffered: true });
-      } catch (error) {
+      } catch {
         // Navigation timing not supported in all browsers
       }
     }

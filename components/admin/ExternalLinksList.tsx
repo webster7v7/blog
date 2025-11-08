@@ -180,7 +180,7 @@ export default function ExternalLinksList({ initialLinks }: ExternalLinksListPro
       {/* 外链表格 */}
       {links.length === 0 ? (
         <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          <p>暂无外链，点击"添加外链"按钮创建第一个外链</p>
+          <p>暂无外链，点击&quot;添加外链&quot;按钮创建第一个外链</p>
         </div>
       ) : (
         <div className="overflow-x-auto">

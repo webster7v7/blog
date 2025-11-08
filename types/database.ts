@@ -27,6 +27,8 @@ export interface Database {
           likes_count: number | null
           favorites_count: number | null
           comments_count: number | null
+          category: string | null
+          cover_image: string | null
         }
         Insert: {
           id?: number
@@ -45,6 +47,8 @@ export interface Database {
           likes_count?: number | null
           favorites_count?: number | null
           comments_count?: number | null
+          category?: string | null
+          cover_image?: string | null
         }
         Update: {
           id?: number
@@ -63,6 +67,40 @@ export interface Database {
           likes_count?: number | null
           favorites_count?: number | null
           comments_count?: number | null
+          category?: string | null
+          cover_image?: string | null
+        }
+      }
+      categories: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          description: string | null
+          color: string
+          icon: string | null
+          order_index: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          description?: string | null
+          color: string
+          icon?: string | null
+          order_index?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          description?: string | null
+          color?: string
+          icon?: string | null
+          order_index?: number
+          created_at?: string
         }
       }
       profiles: {
@@ -198,12 +236,134 @@ export interface Database {
           updated_at?: string
         }
       }
+      projects: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          category: 'miniprogram' | 'app' | 'webpage'
+          icon: string | null
+          file_url: string | null
+          qr_code_url: string | null
+          web_url: string | null
+          tags: string[] | null
+          downloads: number
+          views: number
+          is_published: boolean
+          order_index: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string | null
+          category: 'miniprogram' | 'app' | 'webpage'
+          icon?: string | null
+          file_url?: string | null
+          qr_code_url?: string | null
+          web_url?: string | null
+          tags?: string[] | null
+          downloads?: number
+          views?: number
+          is_published?: boolean
+          order_index?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          category?: 'miniprogram' | 'app' | 'webpage'
+          icon?: string | null
+          file_url?: string | null
+          qr_code_url?: string | null
+          web_url?: string | null
+          tags?: string[] | null
+          downloads?: number
+          views?: number
+          is_published?: boolean
+          order_index?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      personal_links: {
+        Row: {
+          id: string
+          name: string
+          icon: string
+          url: string
+          description: string | null
+          order_index: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          icon: string
+          url: string
+          description?: string | null
+          order_index?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          icon?: string
+          url?: string
+          description?: string | null
+          order_index?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_stats: {
+        Args: { user_uuid: string }
+        Returns: {
+          posts_count: number
+          comments_count: number
+          likes_count: number
+          favorites_count: number
+        }
+      }
+      get_user_profile_stats: {
+        Args: { p_user_id: string }
+        Returns: Array<{
+          user_id: string
+          username: string
+          avatar_url: string | null
+          bio: string | null
+          website: string | null
+          role: string | null
+          created_at: string
+          posts_count: number
+          favorites_count: number
+          likes_count: number
+        }>
+      }
+      get_categories_with_count: {
+        Args: Record<string, never>
+        Returns: Array<{
+          id: string
+          name: string
+          slug: string
+          description: string | null
+          color: string
+          icon: string | null
+          order_index: number
+          created_at: string
+          posts_count: number
+        }>
+      }
     }
     Enums: {
       [_ in never]: never

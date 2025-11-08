@@ -5,12 +5,13 @@ import { useParams } from 'next/navigation';
 import PostCard from '@/components/PostCard';
 import { Star, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import type { PostWithCategory } from '@/types/blog';
 
 interface Favorite {
   id: string;
   created_at: string;
   post_slug: string;
-  posts: any;
+  posts: PostWithCategory;
 }
 
 export default function FavoritesPage() {
@@ -34,10 +35,11 @@ export default function FavoritesPage() {
         }
 
         setFavorites(data.favorites || []);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching favorites:', err);
-        setError(err.message || '加载收藏失败');
-        toast.error(err.message || '加载收藏失败');
+        const errorMessage = err instanceof Error ? err.message : '加载收藏失败';
+        setError(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }

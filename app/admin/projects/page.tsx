@@ -20,17 +20,19 @@ export default async function ProjectsPage() {
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { role: string } | null };
 
   if (!profile || profile.role !== 'admin') {
     redirect('/');
   }
 
   // Fetch all projects
-  const { data: projects = [] } = await supabase
+  const { data: projectsData } = await supabase
     .from('projects')
     .select('*')
     .order('order_index', { ascending: true });
+
+  const projects = projectsData || [];
 
   return (
     <div>

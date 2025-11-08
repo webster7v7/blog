@@ -5,12 +5,13 @@ import { useParams } from 'next/navigation';
 import PostCard from '@/components/PostCard';
 import { Heart, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import type { PostWithCategory } from '@/types/blog';
 
 interface Like {
   id: string;
   created_at: string;
   post_slug: string;
-  posts: any;
+  posts: PostWithCategory;
 }
 
 export default function LikesPage() {
@@ -34,10 +35,11 @@ export default function LikesPage() {
         }
 
         setLikes(data.likes || []);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching likes:', err);
-        setError(err.message || '加载点赞失败');
-        toast.error(err.message || '加载点赞失败');
+        const errorMessage = err instanceof Error ? err.message : '加载点赞失败';
+        setError(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
