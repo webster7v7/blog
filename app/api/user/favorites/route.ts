@@ -41,18 +41,22 @@ export async function GET(request: NextRequest) {
         id,
         created_at,
         post_slug,
-        posts!favorites_post_slug_fkey (
+        posts (
           id,
           title,
           slug,
           excerpt,
+          cover_image,
+          published,
           published_at,
+          created_at,
+          updated_at,
           views,
           tags,
+          category,
           comments_count,
           likes_count,
-          favorites_count,
-          status
+          favorites_count
         )
       `)
       .eq('user_id', userId)
