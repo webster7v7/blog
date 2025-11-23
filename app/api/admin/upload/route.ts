@@ -37,15 +37,34 @@ export async function POST(request: Request) {
       'image/png',
       'image/webp',
       'image/gif',
+      'image/svg+xml',
       'application/vnd.android.package-archive', // .apk
       'application/octet-stream', // Generic binary
       'application/zip',
-      'application/x-zip-compressed'
+      'application/x-zip-compressed',
+      'text/html',
+      'text/css',
+      'text/javascript',
+      'text/plain',
+      'application/json',
+      'application/pdf'
     ];
 
-    if (!allowedTypes.includes(file.type) && !file.name.endsWith('.apk')) {
+    // 允许的文件扩展名白名单（用于补充 MIME 类型检查）
+    const allowedExtensions = [
+      '.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg',
+      '.apk', '.zip', '.pdf',
+      '.html', '.htm',
+      '.css', '.js', '.ts', '.tsx', '.jsx', '.json',
+      '.py', '.java', '.c', '.cpp', '.h', '.cs', '.go', '.rs', '.php', '.rb',
+      '.txt', '.md'
+    ];
+
+    const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
+
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExt)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Allowed: images, APK files' },
+        { error: 'Invalid file type. Allowed: Images, Documents, HTML, Code files' },
         { status: 400 }
       );
     }
@@ -60,8 +79,8 @@ export async function POST(request: Request) {
     }
 
     // Generate unique filename
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const extension = file.name.split('.').pop();
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
 
     // Upload to Supabase storage
     const { data, error } = await supabase.storage

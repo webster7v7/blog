@@ -12,8 +12,8 @@ export default async function TopTagBar() {
   }
 
   return (
-    <div className="fixed top-[73px] left-0 right-0 z-40 backdrop-blur-md bg-white/70 dark:bg-black/70 border-b border-gray-200/20 dark:border-gray-800/20">
-      <nav className="max-w-7xl mx-auto px-6">
+    <div className="fixed top-[60px] md:top-[73px] left-0 right-0 z-40 backdrop-blur-md bg-white/70 dark:bg-black/70 border-b border-gray-200/20 dark:border-gray-800/20">
+      <nav className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="flex items-center justify-center gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] py-3">
           {/* 分类图标和标题 */}
           <div className="flex items-center gap-2.5 text-purple-600 dark:text-purple-400 font-semibold text-base flex-shrink-0 pr-4 mr-2 border-r-2 border-purple-200 dark:border-purple-800">

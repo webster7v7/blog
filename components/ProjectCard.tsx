@@ -46,7 +46,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
 
       {/* 项目图标/封面 */}
       {project.icon && (
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-40 overflow-hidden">
           <img
             src={project.icon}
             alt={project.title}
@@ -64,9 +64,9 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
       )}
 
       {/* 内容 */}
-      <div className="relative z-10 p-6">
+      <div className="relative z-10 p-5">
         {/* 标题 */}
-        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
           {project.title}
         </h3>
 

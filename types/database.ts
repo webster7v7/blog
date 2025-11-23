@@ -321,6 +321,56 @@ export interface Database {
           updated_at?: string
         }
       }
+      html_modules: {
+        Row: {
+          id: string
+          title: string
+          slug: string
+          description: string | null
+          content: string
+          category_id: string | null
+          tags: string[] | null
+          link_type: 'modal' | 'page' | 'external'
+          external_url: string | null
+          cover_image: string | null
+          is_active: boolean
+          order_index: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          slug: string
+          description?: string | null
+          content: string
+          category_id?: string | null
+          tags?: string[] | null
+          link_type?: 'modal' | 'page' | 'external'
+          external_url?: string | null
+          cover_image?: string | null
+          is_active?: boolean
+          order_index?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          slug?: string
+          description?: string | null
+          content?: string
+          category_id?: string | null
+          tags?: string[] | null
+          link_type?: 'modal' | 'page' | 'external'
+          external_url?: string | null
+          cover_image?: string | null
+          is_active?: boolean
+          order_index?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

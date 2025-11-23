@@ -34,12 +34,15 @@ export default function CategoryForm({ category, onClose, onSuccess }: CategoryF
   });
 
   const generateSlug = (name: string) => {
-    return name
+    const slug = name
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
+      // 保留中文、字母、数字、空格和连字符
+      .replace(/[^\w\s\u4e00-\u9fa5-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
+    
+    return slug || `category-${Date.now()}`;
   };
 
   const handleNameChange = (name: string) => {
@@ -126,15 +129,14 @@ export default function CategoryForm({ category, onClose, onSuccess }: CategoryF
             {/* Slug */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                URL 别名 *
+                URL 别名 (可选)
               </label>
               <input
                 type="text"
                 value={formData.slug}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                placeholder="tech, life, essay"
-                required
+                placeholder={generateSlug(formData.name) || "tech, life, essay"}
               />
             </div>
           </div>

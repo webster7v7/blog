@@ -15,8 +15,8 @@ const SearchBar = dynamic(() => import('./SearchBar'), {
 
 export default function Header() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/80 dark:bg-black/80 border-b border-gray-200/20 dark:border-gray-800/20">
-      <nav className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/80 dark:bg-black/80 border-b border-gray-200/20 dark:border-gray-800/20 h-[60px] md:h-[73px] flex items-center">
+      <nav className="max-w-5xl w-full mx-auto px-4 md:px-6 flex items-center justify-between gap-4">
         <OptimizedLink href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
           Webster
         </OptimizedLink>

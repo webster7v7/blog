@@ -1,5 +1,6 @@
 import { FileText, MessageSquare, Eye, Heart } from 'lucide-react';
 import { getCachedDashboardStats } from '@/lib/admin-cache';
+import HtmlModulesList from '@/components/admin/HtmlModulesList';
 
 export default async function AdminDashboard() {
   // ✅ 优化：使用缓存的 Dashboard 统计数据
@@ -110,6 +111,11 @@ export default async function AdminDashboard() {
             <span>预览博客</span>
           </a>
         </div>
+      </div>
+
+      {/* HTML 模块管理 */}
+      <div className="backdrop-blur-md bg-white/80 dark:bg-gray-900/80 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-800/30">
+        <HtmlModulesList />
       </div>
     </div>
   );

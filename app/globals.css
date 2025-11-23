@@ -76,3 +76,17 @@ html {
 }
 
 /* ✅ 性能优化：删除所有装饰性动画，保留 Tailwind 自带的 animate-pulse（骨架屏） */
+
+/* 全屏弹窗淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}

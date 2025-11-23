@@ -23,13 +23,16 @@ export default function PersonalLinksList({ initialLinks }: PersonalLinksListPro
         method: 'DELETE',
       });
 
-      if (!response.ok) throw new Error('Failed to delete');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete');
+      }
 
       setLinks(links.filter(link => link.id !== id));
       toast.success('链接已删除');
     } catch (error) {
       console.error('Error deleting link:', error);
-      toast.error('删除失败');
+      toast.error(error instanceof Error ? error.message : '删除失败');
     }
   };
 

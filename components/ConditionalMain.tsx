@@ -20,7 +20,9 @@ export default function ConditionalMain({ children }: ConditionalMainProps) {
   
   // Admin 路由不需要顶部 padding（没有全局 Header 和 TopTagBar）
   const isAdmin = pathname?.startsWith('/admin');
-  const paddingClass = isAdmin ? 'pt-0' : 'pt-32';
+  // 60px (Header mobile) + 52px (TagBar) = 112px
+  // 73px (Header desktop) + 52px (TagBar) = 125px
+  const paddingClass = isAdmin ? 'pt-0' : 'pt-[112px] md:pt-[125px]';
   
   return (
     <main className={`${paddingClass} min-h-screen`}>

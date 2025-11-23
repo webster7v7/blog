@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { Loader2, Save, Eye } from 'lucide-react';
+import { Loader2, Save, Eye, Upload } from 'lucide-react';
 import type { Category } from '@/types/category';
+import rehypeRaw from 'rehype-raw';
 
 // 动态导入 Markdown 编辑器（仅客户端）
 const MDEditor = dynamic(
@@ -27,8 +28,11 @@ interface PostEditorProps {
 }
 
 export default function PostEditor({ initialData, mode }: PostEditorProps) {
+  // Router for navigation
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -58,12 +62,15 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
 
   // 自动生成 slug
   const generateSlug = (title: string) => {
-    return title
+    const slug = title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
+      // 保留中文、字母、数字、空格和连字符
+      .replace(/[^\w\s\u4e00-\u9fa5-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
+      
+    return slug;
   };
 
   const handleTitleChange = (title: string) => {
@@ -80,10 +87,13 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
       toast.error('请输入标题');
       return;
     }
-    if (!formData.slug.trim()) {
-      toast.error('请输入 URL 别名');
-      return;
+    
+    // 自动生成 slug 如果未填写
+    let finalSlug = formData.slug.trim();
+    if (!finalSlug) {
+      finalSlug = generateSlug(formData.title);
     }
+
     if (!formData.content.trim()) {
       toast.error('请输入内容');
       return;
@@ -99,7 +109,7 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
 
       const postData = {
         title: formData.title.trim(),
-        slug: formData.slug.trim(),
+        slug: finalSlug,
         content: formData.content.trim(),
         excerpt: formData.excerpt.trim() || formData.content.slice(0, 150).trim() + '...',
         tags: tagsArray,
@@ -143,6 +153,73 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
     }
   };
 
+  // 处理文件上传
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 检查文件大小 (50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('文件过大，最大支持 50MB');
+      return;
+    }
+
+    setUploading(true);
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    uploadFormData.append('folder', 'posts');
+
+    try {
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || '上传失败');
+      }
+
+      const data = await response.json();
+      const fileUrl = data.url;
+      const fileName = file.name;
+      const fileExt = fileName.split('.').pop()?.toLowerCase();
+
+      let insertText = '';
+
+      // 根据文件类型生成插入代码
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(fileExt || '')) {
+        // 图片
+        insertText = `![${fileName}](${fileUrl})`;
+      } else if (['html', 'htm'].includes(fileExt || '')) {
+        // HTML 文件：提供 iframe 选项或链接选项
+        insertText = `<iframe src="${fileUrl}" width="100%" height="600px" frameborder="0" class="rounded-lg border border-gray-200 dark:border-gray-700"></iframe>\n\n[查看全屏](${fileUrl})`;
+      } else if (['js', 'ts', 'css', 'py', 'java', 'c', 'cpp', 'json'].includes(fileExt || '')) {
+        // 代码文件
+        insertText = `[下载/查看 ${fileName}](${fileUrl})`;
+      } else {
+        // 其他文件
+        insertText = `[下载附件: ${fileName}](${fileUrl})`;
+      }
+
+      // 插入到编辑器光标位置（简单追加到末尾）
+      setFormData(prev => ({
+        ...prev,
+        content: prev.content + (prev.content ? '\n\n' : '') + insertText
+      }));
+
+      toast.success('上传成功，链接已插入');
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast.error(error.message || '上传失败');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* 标题 */}
@@ -162,6 +239,13 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-lg font-medium"
           disabled={loading}
         />
+        {/* 隐藏的文件上传 Input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileUpload}
+        />
       </div>
 
       {/* URL 别名 */}
@@ -170,7 +254,7 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
           htmlFor="slug"
           className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
         >
-          URL 别名 *
+          URL 别名 (可选)
         </label>
         <input
           id="slug"
@@ -184,7 +268,7 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
           {mode === 'edit' 
             ? '文章 URL 不可修改，避免破坏外部链接' 
-            : `文章的 URL 地址：/posts/${formData.slug || 'your-post-slug'}`
+            : `留空将自动生成：/posts/${formData.slug || 'your-post-slug'}`
           }
         </p>
       </div>

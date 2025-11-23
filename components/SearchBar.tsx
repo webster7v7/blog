@@ -67,7 +67,7 @@ export default function SearchBar() {
       {/* 搜索按钮 */}
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg backdrop-blur-md bg-white/60 dark:bg-gray-900/60 border border-gray-200/30 dark:border-gray-800/30 hover:border-purple-400/50 dark:hover:border-purple-600/50 transition-all"
+        className="flex items-center gap-2 p-2 md:px-4 md:py-2 rounded-lg backdrop-blur-md bg-white/60 dark:bg-gray-900/60 border border-gray-200/30 dark:border-gray-800/30 hover:border-purple-400/50 dark:hover:border-purple-600/50 transition-all"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
