@@ -8,7 +8,7 @@ import HtmlModuleForm from './HtmlModuleForm';
 import { HtmlModuleWithCategory } from '@/types/html-module';
 
 export default function HtmlModulesList() {
-  // const router = useRouter();
+  const router = useRouter();
   const [modules, setModules] = useState<HtmlModuleWithCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -47,7 +47,7 @@ export default function HtmlModulesList() {
 
       toast.success('模块已删除');
       setModules(prev => prev.filter(m => m.id !== module.id));
-    } catch {
+    } catch (error) {
       toast.error('删除失败');
     } finally {
       setDeletingId(null);

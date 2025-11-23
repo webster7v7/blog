@@ -1,6 +1,5 @@
 import { createPublicClient } from '@/lib/supabase';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { HtmlModuleWithCategory } from '@/types/html-module';
 import { Metadata } from 'next';
 
@@ -13,7 +12,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const supabase = createPublicClient();
 
-  // @ts-expect-error - Supabase types not updating immediately
+  // @ts-ignore
   const { data: module } = await supabase
     .from('html_modules')
     .select('title, description')
@@ -37,7 +36,7 @@ export default async function HtmlModulePage({ params }: PageProps) {
   const { slug } = await params;
   const supabase = createPublicClient();
 
-  // @ts-expect-error - Supabase types not updating immediately
+  // @ts-ignore
   const { data: module, error } = await supabase
     .from('html_modules')
     .select('*, categories(*)')
@@ -106,12 +105,12 @@ export default async function HtmlModulePage({ params }: PageProps) {
 
         {/* 返回按钮 */}
         <div className="mt-8">
-          <Link
+          <a
             href="/"
             className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:underline"
           >
             ← 返回首页
-          </Link>
+          </a>
         </div>
       </div>
     </div>

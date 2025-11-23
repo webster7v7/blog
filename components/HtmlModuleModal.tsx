@@ -35,6 +35,8 @@ export default function HtmlModuleModal({ module, onClose }: HtmlModuleModalProp
     const iframe = iframeRef.current;
     if (!iframe) return;
 
+    let observer: MutationObserver | null = null;
+
     const adjustHeight = () => {
       try {
         const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
@@ -53,16 +55,13 @@ export default function HtmlModuleModal({ module, onClose }: HtmlModuleModalProp
       // 监听iframe内容变化
       try {
         const iframeDoc = iframe.contentDocument;
-        if (iframeDoc) {
-          const observer = new MutationObserver(adjustHeight);
+        if (iframeDoc && iframeDoc.body) {
+          observer = new MutationObserver(adjustHeight);
           observer.observe(iframeDoc.body, {
             childList: true,
             subtree: true,
             attributes: true
           });
-          
-          // 清理函数
-          return () => observer.disconnect();
         }
       } catch (error) {
         console.error('Failed to observe iframe content:', error);
@@ -71,8 +70,12 @@ export default function HtmlModuleModal({ module, onClose }: HtmlModuleModalProp
 
     iframe.addEventListener('load', handleLoad);
     
+    // 清理函数
     return () => {
       iframe.removeEventListener('load', handleLoad);
+      if (observer) {
+        observer.disconnect();
+      }
     };
   }, []);
 

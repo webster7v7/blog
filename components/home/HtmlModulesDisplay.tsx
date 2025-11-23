@@ -1,11 +1,11 @@
 import { createPublicClient } from '@/lib/supabase';
 import HtmlModuleCard from '@/components/HtmlModuleCard';
-import { HtmlModule, HtmlModuleWithCategory } from '@/types/html-module';
+import { HtmlModuleWithCategory } from '@/types/html-module';
 
 export default async function HtmlModulesDisplay() {
   const supabase = createPublicClient();
   
-  // @ts-expect-error - Supabase types not updating immediately
+  // @ts-ignore - Supabase types not updating immediately
   const { data: modules, error } = await supabase
     .from('html_modules')
     .select('*, categories(*)')
@@ -22,8 +22,7 @@ export default async function HtmlModulesDisplay() {
   }
 
   // 映射分类数据
-  const typedModules = modules as unknown as HtmlModule[];
-  const modulesWithCategory = typedModules.map((module: any) => ({
+  const modulesWithCategory = modules.map((module: any) => ({
     ...module,
     categoryData: module.categories || null,
   })) as HtmlModuleWithCategory[];

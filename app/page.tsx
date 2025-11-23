@@ -3,7 +3,7 @@ import { getPostsWithCategories, getCachedTags } from '@/lib/posts';
 import PostCard from '@/components/PostCard';
 import TagCloud from '@/components/TagCloud';
 import { PostsListSkeleton, TagCloudSkeleton } from '@/components/loading/Skeleton';
-// import SiteStats from '@/components/SiteStats';
+import SiteStats from '@/components/SiteStats';
 import PersonalSidebar from '@/components/home/PersonalSidebar';
 import ExternalSidebar from '@/components/home/ExternalSidebar';
 import HomeProjectsSection from '@/components/home/HomeProjectsSection';

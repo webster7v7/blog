@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Title, slug and content are required' }, { status: 400 });
   }
 
-  // @ts-expect-error - Supabase types not updating immediately
+  // @ts-ignore - Supabase types not updating immediately
   const { data, error } = await supabase
     .from('html_modules')
     .insert({

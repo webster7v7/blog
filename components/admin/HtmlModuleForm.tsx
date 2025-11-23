@@ -130,9 +130,9 @@ export default function HtmlModuleForm({ module, onClose, onSuccess }: HtmlModul
       toast.success(module ? '模块已更新' : '模块已创建');
       onSuccess();
       onClose();
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Save error:', error);
-      toast.error(error instanceof Error ? error.message : '保存失败');
+      toast.error(error.message || '保存失败');
     } finally {
       setLoading(false);
     }
@@ -222,7 +222,7 @@ export default function HtmlModuleForm({ module, onClose, onSuccess }: HtmlModul
               </label>
               <select
                 value={formData.link_type}
-                onChange={(e) => setFormData(prev => ({ ...prev, link_type: e.target.value as 'modal' | 'page' | 'external' }))}
+                onChange={(e) => setFormData(prev => ({ ...prev, link_type: e.target.value as any }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-800"
                 disabled={loading}
               >
