@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Edit, Trash2, Loader2, Plus, Code, ExternalLink, FileText } from 'lucide-react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 import HtmlModuleForm from './HtmlModuleForm';
 import { HtmlModuleWithCategory } from '@/types/html-module';
 
 export default function HtmlModulesList() {
+  const router = useRouter();
   const [modules, setModules] = useState<HtmlModuleWithCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);

@@ -8,7 +8,7 @@ export default async function ExternalSidebar() {
 
   const getIcon = (iconName: string | null) => {
     if (!iconName) return null;
-    // @ts-expect-error - Dynamic icon access
+    // @ts-ignore - Dynamic icon access
     const Icon = Icons[iconName] || Icons.Link;
     return <Icon className="w-4 h-4" />;
   };
