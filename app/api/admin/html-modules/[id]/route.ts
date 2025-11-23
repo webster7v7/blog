@@ -38,7 +38,7 @@ export async function PUT(
     order_index 
   } = body;
 
-  // @ts-ignore - Supabase types not updating immediately
+  // @ts-expect-error - Supabase types not updating immediately
   const { data, error } = await supabase
     .from('html_modules')
     .update({

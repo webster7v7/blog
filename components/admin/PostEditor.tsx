@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { Loader2, Save, Eye, Upload } from 'lucide-react';
+import { Loader2, Save, Eye } from 'lucide-react';
 import type { Category } from '@/types/category';
-import rehypeRaw from 'rehype-raw';
+// import rehypeRaw from 'rehype-raw';
 
 // 动态导入 Markdown 编辑器（仅客户端）
 const MDEditor = dynamic(
@@ -32,7 +32,7 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [, setUploading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -209,9 +209,9 @@ export default function PostEditor({ initialData, mode }: PostEditorProps) {
       }));
 
       toast.success('上传成功，链接已插入');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Upload error:', error);
-      toast.error(error.message || '上传失败');
+      toast.error(error instanceof Error ? error.message : '上传失败');
     } finally {
       setUploading(false);
       if (fileInputRef.current) {

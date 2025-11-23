@@ -8,7 +8,7 @@ export default async function PersonalSidebar() {
 
   const getIcon = (iconName: string | null) => {
     if (!iconName) return null;
-    // @ts-ignore - Dynamic icon access
+    // @ts-expect-error - Dynamic icon access
     const Icon = Icons[iconName] || Icons.Link;
     return <Icon className="w-5 h-5" />;
   };
