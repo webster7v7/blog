@@ -9,7 +9,7 @@ export async function GET(
   const { slug } = await params;
   const supabase = createPublicClient();
 
-  // @ts-ignore - Supabase types not updating immediately
+  // @ts-expect-error - Supabase types not updating immediately
   const { data, error } = await supabase
     .from('html_modules')
     .select('*, categories(*)')

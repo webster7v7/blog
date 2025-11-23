@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const supabase = createPublicClient();
 
-  // @ts-ignore
+  // @ts-expect-error - Supabase types not updating immediately
   const { data: module } = await supabase
     .from('html_modules')
     .select('title, description')
@@ -36,7 +36,7 @@ export default async function HtmlModulePage({ params }: PageProps) {
   const { slug } = await params;
   const supabase = createPublicClient();
 
-  // @ts-ignore
+  // @ts-expect-error - Supabase types not updating immediately
   const { data: module, error } = await supabase
     .from('html_modules')
     .select('*, categories(*)')
